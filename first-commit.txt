@@ -1,0 +1,14 @@
+Crie uma área de login com email e senha, e com login social do google
+usaremos o supabase para auth
+
+crie uma página de início para pós login, contendo um menu lateral com 
+
+Início
+Meus Programas
+Minhas Tarefas
+Meus Ativos
+Ajuda
+
+toggle de dark/night
+
+stack inicial: vite, react, supabase
