@@ -397,5 +397,6 @@ BEGIN
          FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();',
       t, t
     );
-  END;
+  END LOOP;
+END;
 $$;
