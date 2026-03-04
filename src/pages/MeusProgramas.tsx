@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { supabase, hasSupabaseConfig } from '../lib/supabase';
 import './MeusProgramas.css';
 
 type Programa = {
@@ -19,6 +19,11 @@ export default function MeusProgramas() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!hasSupabaseConfig) {
+      setLoading(false);
+      setError('Supabase não configurado. Crie um .env com VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY e reinicie o servidor (npm run dev).');
+      return;
+    }
     if (authLoading || !user) {
       setLoading(false);
       setProgramas([]);
@@ -27,20 +32,17 @@ export default function MeusProgramas() {
     async function load() {
       setLoading(true);
       setError(null);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        setLoading(false);
-        setError('Sessão não encontrada. Faça login novamente.');
-        return;
-      }
       const { data, error: err } = await supabase
         .from('programas')
         .select('id, titulo, organization_id, created_at, updated_at')
         .order('updated_at', { ascending: false });
       setLoading(false);
+      if (import.meta.env.DEV) {
+        console.log('[MeusProgramas] Resposta:', err ? { error: err.message, code: err.code } : { total: (data ?? []).length, programas: data });
+      }
       if (err) {
         console.error('[MeusProgramas] Supabase error:', err);
-        setError('Não foi possível carregar os programas. Abra o console (F12) para ver o erro. Se você entrou com Google, adicione seu usuário à organização (veja supabase/add_user_to_demo_org.sql).');
+        setError(`Erro ao carregar: ${err.message}. Verifique .env (URL e Anon key) e o console (F12).`);
         return;
       }
       setProgramas(data ?? []);
