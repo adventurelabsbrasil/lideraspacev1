@@ -42,6 +42,29 @@ npm run dev
 
 Acesse [http://localhost:5173](http://localhost:5173). Use **Login** para entrar com email/senha ou com Google (se configurado).
 
+## Deploy no Vercel
+
+1. **Conectar o repositório**
+   - Acesse [vercel.com](https://vercel.com) e faça login (GitHub recomendado).
+   - **Add New** → **Project** e importe o repositório do LideraSpace (conecte o GitHub se ainda não estiver conectado).
+   - O Vercel detecta Vite automaticamente; o `vercel.json` já define build e rewrites para SPA.
+
+2. **Variáveis de ambiente**
+   - Em **Settings** → **Environment Variables** do projeto, adicione:
+     - `VITE_SUPABASE_URL` = URL do seu projeto Supabase
+     - `VITE_SUPABASE_ANON_KEY` = Anon key do Supabase
+   - Marque **Production**, **Preview** e **Development** se quiser usar em todos os ambientes.
+   - Faça um novo deploy após salvar (ou dispare um deploy manual).
+
+3. **Supabase (produção)**
+   - No [Supabase](https://app.supabase.com): **Authentication** → **URL Configuration**.
+   - Em **Site URL** use a URL do Vercel (ex.: `https://seu-projeto.vercel.app`).
+   - Em **Redirect URLs** adicione `https://seu-projeto.vercel.app/**` (e `https://*.vercel.app/**` se usar previews).
+   - Se usar login com Google, o redirect pós-login funcionará após essa configuração.
+
+4. **Deploy**
+   - Cada push na branch conectada (ex.: `main`) gera um deploy automático. O primeiro deploy roda após você clicar em **Deploy** na importação.
+
 ## Scripts
 
 - `npm run dev` — servidor de desenvolvimento
