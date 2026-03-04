@@ -35,9 +35,16 @@ export default function ProgramaNovo() {
         setError('Não foi possível carregar as organizações.');
         return;
       }
-      const orgs: Organization[] = (data ?? [])
-        .map((row: { organizations: { id: string; nome: string } | null }) => row.organizations)
-        .filter(Boolean) as Organization[];
+      type Row = { organization_id: string; organizations: { id: string; nome: string } | { id: string; nome: string }[] | null };
+      const seen = new Set<string>();
+      const orgs: Organization[] = (data ?? []).reduce<Organization[]>((acc, row: Row) => {
+        const org = Array.isArray(row.organizations) ? row.organizations[0] : row.organizations;
+        if (org?.id && org?.nome && !seen.has(org.id)) {
+          seen.add(org.id);
+          acc.push({ id: org.id, nome: org.nome });
+        }
+        return acc;
+      }, []);
       setOrganizations(orgs);
       if (orgs.length > 0 && !organizationId) setOrganizationId(orgs[0].id);
     }

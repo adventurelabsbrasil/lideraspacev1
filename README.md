@@ -70,12 +70,13 @@ Acesse [http://localhost:5173](http://localhost:5173). Faça login e use o menu 
    - **Add New** → **Project** e importe o repositório do LideraSpace (conecte o GitHub se ainda não estiver conectado).
    - O Vercel detecta Vite automaticamente; o `vercel.json` já define build e rewrites para SPA.
 
-2. **Variáveis de ambiente**
-   - Em **Settings** → **Environment Variables** do projeto, adicione:
-     - `VITE_SUPABASE_URL` = URL do seu projeto Supabase
-     - `VITE_SUPABASE_ANON_KEY` = Anon key do Supabase
-   - Marque **Production**, **Preview** e **Development** se quiser usar em todos os ambientes.
-   - Faça um novo deploy após salvar (ou dispare um deploy manual).
+2. **Variáveis de ambiente (obrigatório para o app funcionar no Vercel)**
+   - No Vercel: **Settings** → **Environment Variables** do projeto.
+   - Adicione exatamente (nomes com VITE_):
+     - `VITE_SUPABASE_URL` = URL do projeto (ex.: `https://xxxx.supabase.co`)
+     - `VITE_SUPABASE_ANON_KEY` = Anon key (em Supabase: Settings → API → anon public).
+   - Marque **Production** (e **Preview** se quiser em branches).
+   - **Importante:** no Vite as variáveis são embutidas no build. Depois de criar/alterar as variáveis, é obrigatório **gerar um novo deploy** (Deployments → ⋮ no último deploy → Redeploy, ou dê um push no repositório). Sem isso, o app no Vercel continua sem URL/chave e programas e login não funcionam.
 
 3. **Supabase (produção)**
    - No [Supabase](https://app.supabase.com): **Authentication** → **URL Configuration**.
