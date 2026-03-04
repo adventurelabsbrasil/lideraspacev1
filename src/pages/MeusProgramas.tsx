@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import './MeusProgramas.css';
 
@@ -12,11 +13,17 @@ type Programa = {
 };
 
 export default function MeusProgramas() {
+  const { user } = useAuth();
   const [programas, setProgramas] = useState<Programa[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      setProgramas([]);
+      return;
+    }
     async function load() {
       setLoading(true);
       setError(null);
@@ -32,7 +39,7 @@ export default function MeusProgramas() {
       setProgramas(data ?? []);
     }
     load();
-  }, []);
+  }, [user?.id]);
 
   return (
     <div className="page-content meus-programas-page">
