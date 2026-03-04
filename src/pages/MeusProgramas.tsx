@@ -13,13 +13,13 @@ type Programa = {
 };
 
 export default function MeusProgramas() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [programas, setProgramas] = useState<Programa[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) {
+    if (authLoading || !user) {
       setLoading(false);
       setProgramas([]);
       return;
@@ -27,19 +27,26 @@ export default function MeusProgramas() {
     async function load() {
       setLoading(true);
       setError(null);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setLoading(false);
+        setError('Sessão não encontrada. Faça login novamente.');
+        return;
+      }
       const { data, error: err } = await supabase
         .from('programas')
         .select('id, titulo, organization_id, created_at, updated_at')
         .order('updated_at', { ascending: false });
       setLoading(false);
       if (err) {
-        setError('Não foi possível carregar os programas.');
+        console.error('[MeusProgramas] Supabase error:', err);
+        setError('Não foi possível carregar os programas. Abra o console (F12) para ver o erro. Se você entrou com Google, adicione seu usuário à organização (veja supabase/add_user_to_demo_org.sql).');
         return;
       }
       setProgramas(data ?? []);
     }
     load();
-  }, [user?.id]);
+  }, [authLoading, user?.id]);
 
   return (
     <div className="page-content meus-programas-page">

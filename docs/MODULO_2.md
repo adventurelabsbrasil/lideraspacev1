@@ -23,12 +23,7 @@ Schema em `supabase/migrations/001_schema_organizacoes_programas.sql`:
 | `tarefas`              | Tarefas: programa, módulo (opcional), título, status, criador, datas |
 | `ativos`              | Ativos: programa, módulo (opcional), título, link, tipo de ícone (planilha, docs, pdf, video, link) |
 
-**Acesso (RLS):**
-- **Organização** define quem vê o conteúdo (membros da organização).
-- **Admin** = usuário com `role = 'admin'` na organização **ou** criador do programa (`created_by`). Pode criar/editar programas, módulos, tarefas e ativos.
-- **Cliente/aluno** = `role = 'member'`. Apenas leitura.
-
-Funções auxiliares: `user_can_admin_program(programa_id)`, `user_in_organization(organization_id)`.
+RLS (Row Level Security) e controle de acesso por organização ficarão para um **módulo futuro**.
 
 ### 3. Telas de detalhe
 - **Programa** — `/programas/:id` (`ProgramaDetalhe.tsx`)
@@ -68,3 +63,4 @@ Cada uma com breadcrumb e área de conteúdo (dados reais a conectar depois).
 - Conectar a página **Início** aos dados reais do Supabase (programas, tarefas, ativos por organização).
 - Preencher as telas de **detalhe** com dados do Supabase.
 - Área **admin** para edição de programas, módulos, tarefas e ativos.
+- **Módulo futuro:** RLS no Supabase (acesso por organização, admin vs member).

@@ -109,4 +109,4 @@ supabase/
 
 ## Segurança (multitenant)
 
-Em produção, use apenas a **Anon key** no frontend. O acesso aos dados é controlado por **organização**: configure RLS no Supabase e sempre filtre por organização (ou por programa/entidade ligada à organização). Admin da organização e criador do programa têm permissão de escrita; membros têm apenas leitura. Ver [Módulo 2](docs/MODULO_2.md).
+Em produção, use apenas a **Anon key** no frontend. RLS (Row Level Security) e controle de acesso por organização estão previstos para um **módulo futuro**; até lá, o schema não aplica RLS nas tabelas.
