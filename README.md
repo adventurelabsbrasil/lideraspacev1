@@ -1,6 +1,20 @@
 # LideraSpace
 
-Aplicação Vite + React com autenticação Supabase (email/senha e Google), layout com menu lateral e tema claro/escuro.
+Aplicação para gestão de programas de liderança: autenticação (Supabase), dashboard inicial, programas por organização, módulos, tarefas e ativos. Desenvolvida com Vite + React.
+
+## Visão geral
+
+- **Módulo 1** — Autenticação (email/senha e Google), layout com menu lateral, tema claro/escuro, páginas base.
+- **Módulo 2** — Página inicial (boas-vindas, cards de programas, tabela de tarefas, scorecards de ativos), modelo de dados no Supabase (organizações, programas, módulos, tarefas, ativos), RLS por organização, telas de detalhe e fluxo “Novo programa”.
+
+A documentação de cada módulo fica em `docs/`:
+
+- [Módulo 1 — Autenticação e estrutura base](docs/MODULO_1.md)
+- [Módulo 2 — Página inicial, modelo de dados e fluxo de programas](docs/MODULO_2.md)
+
+Conforme o app evoluir, novos módulos e documentação podem ser adicionados em `docs/` (ex.: `MODULO_3.md`).
+
+---
 
 ## Pré-requisitos
 
@@ -26,21 +40,28 @@ VITE_SUPABASE_ANON_KEY=sua-anon-key
 
 A **URL** e a **Anon key** ficam em: [Supabase Dashboard](https://app.supabase.com) → seu projeto → **Settings** → **API**.
 
-### 2. Login com Google (opcional)
+### 2. Banco de dados (Módulo 2)
 
-Para usar "Entrar com Google":
+No **SQL Editor** do Supabase, execute em ordem:
+
+1. `supabase/migrations/001_schema_organizacoes_programas.sql` — cria tabelas e RLS.
+2. (Opcional) `supabase/seed_mock_data.sql` — popula dados de exemplo (é necessário ter pelo menos um usuário em Auth antes).
+
+### 3. Login com Google (opcional)
+
+Para usar “Entrar com Google”:
 
 1. No Supabase: **Authentication** → **Providers** → **Google** → ative e preencha **Client ID** e **Client Secret** do [Google Cloud Console](https://console.cloud.google.com/).
 2. Em **Authentication** → **URL Configuration**, defina **Site URL** (ex.: `http://localhost:5173` para dev) e em **Redirect URLs** adicione `http://localhost:5173/**` (e a URL de produção quando houver).
 
-### 3. Instalação e execução
+### 4. Instalação e execução
 
 ```bash
 npm install
 npm run dev
 ```
 
-Acesse [http://localhost:5173](http://localhost:5173). Use **Login** para entrar com email/senha ou com Google (se configurado).
+Acesse [http://localhost:5173](http://localhost:5173). Faça login e use o menu para navegar (Início, Meus Programas, etc.).
 
 ## Deploy no Vercel
 
@@ -72,13 +93,20 @@ Acesse [http://localhost:5173](http://localhost:5173). Use **Login** para entrar
 - `npm run preview` — preview do build
 - `npm run lint` — ESLint
 
-## Estrutura
+## Estrutura do projeto
 
-- `src/pages/` — Login e páginas do app (Início, Meus Programas, etc.)
-- `src/components/` — Layout, Sidebar, ProtectedRoute
-- `src/contexts/` — AuthContext (Supabase), ThemeContext (claro/escuro)
-- `src/lib/` — cliente Supabase
+```
+src/
+  pages/        # Páginas: Login, Início, Programas, Tarefas, Ativos, Ajuda, detalhes, ProgramaNovo
+  components/   # Layout, ProtectedRoute
+  contexts/     # AuthContext, ThemeContext
+  lib/          # cliente Supabase
+docs/           # Documentação por módulo (MODULO_1.md, MODULO_2.md, …)
+supabase/
+  migrations/   # Schema (organizações, programas, módulos, tarefas, ativos)
+  seed_mock_data.sql
+```
 
 ## Segurança (multitenant)
 
-Em produção, use apenas a **Anon key** no frontend. Para dados por cliente, configure RLS no Supabase e sempre filtre por `tenant_id` ou `client_id`.
+Em produção, use apenas a **Anon key** no frontend. O acesso aos dados é controlado por **organização**: configure RLS no Supabase e sempre filtre por organização (ou por programa/entidade ligada à organização). Admin da organização e criador do programa têm permissão de escrita; membros têm apenas leitura. Ver [Módulo 2](docs/MODULO_2.md).

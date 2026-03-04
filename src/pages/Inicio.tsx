@@ -45,7 +45,10 @@ export default function Inicio() {
 
       {/* 2. Cards dos Programas */}
       <section className="inicio-section">
-        <h2 className="inicio-section-title">Meus Programas</h2>
+        <div className="inicio-section-header">
+          <h2 className="inicio-section-title">Meus Programas</h2>
+          <Link to="/programas/novo" className="inicio-btn-novo">Novo programa</Link>
+        </div>
         <div className="inicio-cards">
           {programasMock.map((p) => (
             <Link key={p.id} to={`/programas/${p.id}`} className="inicio-card">
@@ -60,7 +63,9 @@ export default function Inicio() {
             </Link>
           ))}
         </div>
-        <Link to="/programas" className="inicio-link-more">Ver todos os programas →</Link>
+        <div className="inicio-links-row">
+          <Link to="/programas" className="inicio-link-more">Ver todos os programas →</Link>
+        </div>
       </section>
 
       {/* 3. Tabela resumo de tarefas */}

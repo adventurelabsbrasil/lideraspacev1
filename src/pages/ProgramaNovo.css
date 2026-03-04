@@ -1,0 +1,131 @@
+/* Página Novo programa */
+
+.programa-novo-page {
+  max-width: 560px;
+}
+
+.programa-novo-title {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.programa-novo-desc {
+  margin: 0 0 1.5rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.programa-novo-loading {
+  color: var(--text-muted);
+}
+
+.programa-novo-empty {
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.programa-novo-empty p {
+  margin: 0 0 0.5rem;
+  color: var(--text-secondary);
+}
+
+.programa-novo-empty p:last-of-type {
+  margin-bottom: 1rem;
+}
+
+.programa-novo-link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.programa-novo-link:hover {
+  text-decoration: underline;
+}
+
+.programa-novo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.programa-novo-error {
+  margin: 0;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--error-text);
+  background: var(--error-bg);
+  border-radius: 8px;
+}
+
+.programa-novo-field label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.programa-novo-field input,
+.programa-novo-field select {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.programa-novo-field input:focus,
+.programa-novo-field select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--focus-ring-alpha);
+}
+
+.programa-novo-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.programa-novo-btn {
+  padding: 0.6rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.programa-novo-btn-cancel {
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
+.programa-novo-btn-cancel:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.programa-novo-btn-submit {
+  color: var(--primary-text);
+  background: var(--primary);
+  border: none;
+}
+
+.programa-novo-btn-submit:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.programa-novo-btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
