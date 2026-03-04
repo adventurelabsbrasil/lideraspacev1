@@ -1,0 +1,76 @@
+/* Páginas de detalhe (Programa, Módulo, Tarefa, Ativo) */
+
+.detalhe-page {
+  max-width: 800px;
+}
+
+.detalhe-breadcrumb {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.detalhe-breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.detalhe-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.detalhe-breadcrumb-sep {
+  margin: 0 0.35rem;
+}
+
+.detalhe-header {
+  margin-bottom: 1.5rem;
+}
+
+.detalhe-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detalhe-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.detalhe-meta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.detalhe-section {
+  margin-bottom: 1.5rem;
+}
+
+.detalhe-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.detalhe-placeholder {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.detalhe-link {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.detalhe-link:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,255 @@
+/* Página Início - Módulo 2 */
+
+.inicio-page {
+  max-width: 960px;
+}
+
+/* 1. Boas-vindas */
+.inicio-welcome {
+  margin-bottom: 2rem;
+}
+
+.inicio-welcome-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.inicio-welcome-subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Seções genéricas */
+.inicio-section {
+  margin-bottom: 2.5rem;
+}
+
+.inicio-section-title {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.inicio-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.inicio-section-header .inicio-section-title {
+  margin: 0;
+}
+
+.inicio-link-more {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.inicio-link-more:hover {
+  text-decoration: underline;
+}
+
+/* 2. Cards dos Programas */
+.inicio-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.inicio-card {
+  display: block;
+  padding: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.inicio-card:hover {
+  box-shadow: var(--shadow);
+  border-color: var(--primary);
+}
+
+.inicio-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.inicio-card-nome {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.inicio-card-badge {
+  flex-shrink: 0;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: var(--primary-alpha);
+  color: var(--primary);
+  border-radius: 6px;
+}
+
+.inicio-card-progress {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.inicio-card-progress-bar {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.inicio-card-pct {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* 3. Tabela resumo de tarefas */
+.inicio-table-wrap {
+  overflow-x: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.inicio-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.inicio-table th,
+.inicio-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.inicio-table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--hover-bg);
+}
+
+.inicio-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.inicio-table tbody tr:hover td {
+  background: var(--hover-bg);
+}
+
+.inicio-table-titulo {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.inicio-table-link {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.inicio-table-link:hover {
+  text-decoration: underline;
+}
+
+.inicio-scorecard--link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.inicio-scorecard--link:hover {
+  border-color: var(--primary);
+}
+
+.inicio-status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 6px;
+}
+
+.inicio-status--concluída {
+  background: #dcfce7;
+  color: #166534;
+}
+
+[data-theme="dark"] .inicio-status--concluída {
+  background: rgba(34, 197, 94, 0.25);
+  color: #86efac;
+}
+
+.inicio-status--em-andamento {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+[data-theme="dark"] .inicio-status--em-andamento {
+  background: rgba(245, 158, 11, 0.25);
+  color: #fcd34d;
+}
+
+.inicio-status--pendente {
+  background: var(--hover-bg);
+  color: var(--text-muted);
+}
+
+/* 4. Scorecards últimos ativos */
+.inicio-scorecards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.inicio-scorecard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.inicio-scorecard-tipo {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--primary);
+}
+
+.inicio-scorecard-titulo {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.inicio-scorecard-quando {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
