@@ -5,8 +5,11 @@ import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import MeusProgramas from './pages/MeusProgramas';
 import ProgramaDetalhe from './pages/ProgramaDetalhe';
+import ProgramaEditar from './pages/ProgramaEditar';
 import ProgramaNovo from './pages/ProgramaNovo';
 import ModuloDetalhe from './pages/ModuloDetalhe';
+import ModuloNovo from './pages/ModuloNovo';
+import ModuloEditar from './pages/ModuloEditar';
 import MinhasTarefas from './pages/MinhasTarefas';
 import TarefaDetalhe from './pages/TarefaDetalhe';
 import MeusAtivos from './pages/MeusAtivos';
@@ -28,6 +31,9 @@ export default function App() {
         <Route index element={<Inicio />} />
         <Route path="programas" element={<MeusProgramas />} />
         <Route path="programas/novo" element={<ProgramaNovo />} />
+        <Route path="programas/:id/editar" element={<ProgramaEditar />} />
+        <Route path="programas/:id/modulos/novo" element={<ModuloNovo />} />
+        <Route path="programas/:programaId/modulos/:moduloId/editar" element={<ModuloEditar />} />
         <Route path="programas/:id" element={<ProgramaDetalhe />} />
         <Route path="programas/:programaId/modulos/:moduloId" element={<ModuloDetalhe />} />
         <Route path="tarefas" element={<MinhasTarefas />} />

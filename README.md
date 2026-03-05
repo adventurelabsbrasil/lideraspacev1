@@ -5,14 +5,14 @@ Aplicação para gestão de programas de liderança: autenticação (Supabase), 
 ## Visão geral
 
 - **Módulo 1** — Autenticação (email/senha e Google), layout com menu lateral, tema claro/escuro, páginas base.
-- **Módulo 2** — Página inicial (boas-vindas, cards de programas, tabela de tarefas, scorecards de ativos), modelo de dados no Supabase (organizações, programas, módulos, tarefas, ativos), RLS por organização, telas de detalhe e fluxo “Novo programa”.
+- **Módulo 2** — Página inicial (boas-vindas, cards de programas, tabela de tarefas, scorecards de ativos), modelo de dados no Supabase (organizações, programas, módulos, tarefas, ativos), telas de detalhe e fluxo “Novo programa”.
+- **Módulo 3** — UI/UX (design tokens, componentes base), layout responsivo (sidebar drawer em mobile), telas de detalhe com dados reais e vídeo YouTube, área admin contextual (editar programa, novo/editar módulo com vídeo e materiais).
 
 A documentação de cada módulo fica em `docs/`:
 
 - [Módulo 1 — Autenticação e estrutura base](docs/MODULO_1.md)
 - [Módulo 2 — Página inicial, modelo de dados e fluxo de programas](docs/MODULO_2.md)
-
-Conforme o app evoluir, novos módulos e documentação podem ser adicionados em `docs/` (ex.: `MODULO_3.md`).
+- [Módulo 3 — UI/UX, responsividade e área admin](docs/MODULO_3.md)
 
 ---
 
@@ -98,11 +98,12 @@ Acesse [http://localhost:5173](http://localhost:5173). Faça login e use o menu 
 
 ```
 src/
-  pages/        # Páginas: Login, Início, Programas, Tarefas, Ativos, Ajuda, detalhes, ProgramaNovo
-  components/   # Layout, ProtectedRoute
+  pages/        # Login, Início, Programas, ProgramaNovo, ProgramaEditar, ProgramaDetalhe,
+               # ModuloDetalhe, ModuloNovo, ModuloEditar, ModuloForm, Tarefas, Ativos, Ajuda, detalhes
+  components/   # Layout, ProtectedRoute, ui.css (componentes base)
   contexts/     # AuthContext, ThemeContext
   lib/          # cliente Supabase
-docs/           # Documentação por módulo (MODULO_1.md, MODULO_2.md, …)
+docs/           # Documentação por módulo (MODULO_1.md, MODULO_2.md, MODULO_3.md, …)
 supabase/
   migrations/   # Schema (organizações, programas, módulos, tarefas, ativos)
   seed_mock_data.sql

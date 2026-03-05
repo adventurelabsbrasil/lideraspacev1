@@ -1,0 +1,111 @@
+.modulo-form-page {
+  max-width: 640px;
+}
+
+.modulo-form-group {
+  margin-bottom: 0.5rem;
+}
+
+.modulo-form-group label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.modulo-form-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.modulo-form-group-header label {
+  margin: 0;
+}
+
+.modulo-form-add-btn {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--primary);
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.modulo-form-add-btn:hover {
+  background: var(--primary-alpha);
+}
+
+.modulo-form-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.modulo-form-row input {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.modulo-form-remove-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.modulo-form-remove-btn:hover {
+  color: var(--error-text);
+  border-color: var(--error-text);
+}
+
+.modulo-form-material-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.modulo-form-material-row input,
+.modulo-form-material-row select {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+@media (max-width: 767px) {
+  .modulo-form-material-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .modulo-form-material-row .modulo-form-remove-btn {
+    grid-column: span 2;
+    justify-self: start;
+  }
+}
