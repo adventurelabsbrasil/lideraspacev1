@@ -1,0 +1,134 @@
+/* Rich text (Markdown) — estilo Notion-like */
+
+.rich-text-content {
+  font-size: var(--font-size-base, 1rem);
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.rich-text-content > *:first-child {
+  margin-top: 0;
+}
+
+.rich-text-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.rich-text-content p {
+  margin: 0 0 0.75em;
+}
+
+.rich-text-content p:last-child {
+  margin-bottom: 0;
+}
+
+.rich-text-content strong {
+  font-weight: var(--font-weight-bold, 700);
+}
+
+.rich-text-content em {
+  font-style: italic;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  margin: 0 0 0.75em;
+  padding-left: 1.5em;
+}
+
+.rich-text-content li {
+  margin-bottom: 0.25em;
+}
+
+.rich-text-content li p {
+  margin-bottom: 0.25em;
+}
+
+.rich-text-content h1,
+.rich-text-content h2,
+.rich-text-content h3 {
+  margin: 1.25em 0 0.5em;
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--text-primary);
+}
+
+.rich-text-content h1 { font-size: 1.35rem; }
+.rich-text-content h2 { font-size: 1.2rem; }
+.rich-text-content h3 { font-size: 1.05rem; }
+
+.rich-text-content h1:first-child,
+.rich-text-content h2:first-child,
+.rich-text-content h3:first-child {
+  margin-top: 0;
+}
+
+.rich-text-content blockquote {
+  margin: 0.75em 0;
+  padding: 0.25em 0 0.25em 1em;
+  border-left: 4px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.rich-text-content code {
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+  background: var(--hover-bg);
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border);
+}
+
+.rich-text-content pre {
+  margin: 0.75em 0;
+  padding: 1rem;
+  overflow-x: auto;
+  background: var(--hover-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+}
+
+.rich-text-content pre code {
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.rich-text-content table {
+  width: 100%;
+  margin: 0.75em 0;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.rich-text-content th,
+.rich-text-content td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border: 1px solid var(--border);
+}
+
+.rich-text-content th {
+  font-weight: var(--font-weight-semibold, 600);
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.rich-text-content tr:hover td {
+  background: var(--bg-card);
+}
+
+.rich-text-link {
+  color: var(--primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.rich-text-link:hover {
+  text-decoration: underline;
+}
+
+.rich-text-link-icon {
+  font-size: 1em;
+  flex-shrink: 0;
+}

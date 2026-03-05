@@ -7,12 +7,14 @@ Aplicação para gestão de programas de liderança: autenticação (Supabase), 
 - **Módulo 1** — Autenticação (email/senha e Google), layout com menu lateral, tema claro/escuro, páginas base.
 - **Módulo 2** — Página inicial (boas-vindas, cards de programas, tabela de tarefas, scorecards de ativos), modelo de dados no Supabase (organizações, programas, módulos, tarefas, ativos), telas de detalhe e fluxo “Novo programa”.
 - **Módulo 3** — UI/UX (design tokens, componentes base), layout responsivo (sidebar drawer em mobile), telas de detalhe com dados reais e vídeo YouTube, área admin contextual (editar programa, novo/editar módulo com vídeo e materiais).
+- **Módulo 4** — Rich text estilo Notion nos módulos (Markdown com editor de toolbar e renderização com links iconizados); banners e favicons com opção de URL ou upload no Supabase Storage.
 
 A documentação de cada módulo fica em `docs/`:
 
 - [Módulo 1 — Autenticação e estrutura base](docs/MODULO_1.md)
 - [Módulo 2 — Página inicial, modelo de dados e fluxo de programas](docs/MODULO_2.md)
 - [Módulo 3 — UI/UX, responsividade e área admin](docs/MODULO_3.md)
+- [Módulo 4 — Rich text e imagens (URL + upload)](docs/MODULO_4.md)
 
 ---
 
@@ -40,12 +42,13 @@ VITE_SUPABASE_ANON_KEY=sua-anon-key
 
 A **URL** e a **Anon key** ficam em: [Supabase Dashboard](https://app.supabase.com) → seu projeto → **Settings** → **API**.
 
-### 2. Banco de dados (Módulo 2)
+### 2. Banco de dados
 
 No **SQL Editor** do Supabase, execute em ordem:
 
-1. `supabase/migrations/001_schema_organizacoes_programas.sql` — cria tabelas e RLS.
-2. (Opcional) `supabase/seed_mock_data.sql` — popula dados de exemplo (é necessário ter pelo menos um usuário em Auth antes).
+1. `supabase/migrations/001_schema_organizacoes_programas.sql` — cria tabelas.
+2. `supabase/migrations/002_modulo_conteudo_and_storage.sql` — coluna `conteudo` em modulos e bucket Storage para imagens (Módulo 4).
+3. (Opcional) `supabase/seed_mock_data.sql` — popula dados de exemplo (é necessário ter pelo menos um usuário em Auth antes).
 
 ### 3. Login com Google (opcional)
 

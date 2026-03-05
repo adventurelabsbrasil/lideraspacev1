@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import MDEditor from '@uiw/react-md-editor';
+import { useTheme } from '../contexts/ThemeContext';
 import { supabase } from '../lib/supabase';
+import ImageUrlOrUpload from '../components/ImageUrlOrUpload';
 import './Detalhe.css';
 import './ProgramaNovo.css';
 import './ModuloForm.css';
+import '@uiw/react-md-editor/markdown-editor.css';
 
 type MaterialItem = { url: string; label: string; icon: string };
 
@@ -23,6 +27,7 @@ type Props = {
 
 export default function ModuloForm({ programaId, moduloId }: Props) {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const isEdit = Boolean(moduloId);
   const [loading, setLoading] = useState(isEdit);
   const [submitting, setSubmitting] = useState(false);
@@ -30,6 +35,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
 
   const [titulo, setTitulo] = useState('');
   const [ordem, setOrdem] = useState(0);
+  const [conteudo, setConteudo] = useState('');
   const [topicos, setTopicos] = useState<string[]>([]);
   const [subtopicos, setSubtopicos] = useState<string[]>([]);
   const [videoYoutubeUrl, setVideoYoutubeUrl] = useState('');
@@ -47,7 +53,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       setError(null);
       const { data, error: err } = await supabase
         .from('modulos')
-        .select('titulo, ordem, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, favicon_programa_url')
+        .select('titulo, ordem, conteudo, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, favicon_programa_url')
         .eq('id', moduloId)
         .eq('programa_id', programaId)
         .single();
@@ -59,6 +65,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       const row = data as {
         titulo: string;
         ordem: number;
+        conteudo: string | null;
         topicos: string[];
         subtopicos: string[];
         video_youtube_embed_url: string | null;
@@ -68,6 +75,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       };
       setTitulo(row.titulo ?? '');
       setOrdem(row.ordem ?? 0);
+      setConteudo(row.conteudo ?? '');
       setTopicos(Array.isArray(row.topicos) ? row.topicos : []);
       setSubtopicos(Array.isArray(row.subtopicos) ? row.subtopicos : []);
       setVideoYoutubeUrl(row.video_youtube_embed_url ?? '');
@@ -140,6 +148,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
         .update({
           titulo: titulo.trim(),
           ordem: Number(ordem) || 0,
+          conteudo: conteudo.trim() || null,
           topicos: topicos.filter((t) => t.trim()).map((t) => t.trim()),
           subtopicos: subtopicos.filter((s) => s.trim()).map((s) => s.trim()),
           video_youtube_embed_url: embedUrl,
@@ -162,6 +171,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
           programa_id: programaId,
           titulo: titulo.trim(),
           ordem: Number(ordem) || 0,
+          conteudo: conteudo.trim() || null,
           topicos: topicos.filter((t) => t.trim()).map((t) => t.trim()),
           subtopicos: subtopicos.filter((s) => s.trim()).map((s) => s.trim()),
           video_youtube_embed_url: embedUrl,
@@ -235,9 +245,22 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             placeholder="https://www.youtube.com/watch?v=..."
           />
         </div>
+        <div className="programa-novo-field modulo-form-rich-field">
+          <label>Conteúdo (rich text)</label>
+          <p className="modulo-form-rich-hint">Use a barra de ferramentas para negrito, itálico, listas, links e tabelas.</p>
+          <div data-color-mode={theme}>
+            <MDEditor
+              value={conteudo}
+              onChange={(v) => setConteudo(v ?? '')}
+              height={280}
+              preview="live"
+              visibleDragbar={false}
+            />
+          </div>
+        </div>
         <div className="modulo-form-group">
           <div className="modulo-form-group-header">
-            <label>Tópicos</label>
+            <label>Tópicos (opcional, legado)</label>
             <button type="button" className="modulo-form-add-btn" onClick={addTopico}>
               + Adicionar
             </button>
@@ -314,26 +337,22 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             </div>
           ))}
         </div>
-        <div className="programa-novo-field">
-          <label htmlFor="modulo-banner">URL da imagem banner do módulo</label>
-          <input
-            id="modulo-banner"
-            type="url"
-            value={imagemBannerUrl}
-            onChange={(e) => setImagemBannerUrl(e.target.value)}
-            placeholder="https://..."
-          />
-        </div>
-        <div className="programa-novo-field">
-          <label htmlFor="modulo-favicon">URL do favicon do programa (módulo)</label>
-          <input
-            id="modulo-favicon"
-            type="url"
-            value={faviconProgramaUrl}
-            onChange={(e) => setFaviconProgramaUrl(e.target.value)}
-            placeholder="https://..."
-          />
-        </div>
+        <ImageUrlOrUpload
+          label="URL da imagem banner do módulo"
+          value={imagemBannerUrl}
+          onChange={setImagemBannerUrl}
+          placeholder="https://..."
+          variant="banner"
+          uploadContext={moduloId ? { pathPrefix: 'modulos/banner', contextId: moduloId } : undefined}
+        />
+        <ImageUrlOrUpload
+          label="URL do favicon do programa (módulo)"
+          value={faviconProgramaUrl}
+          onChange={setFaviconProgramaUrl}
+          placeholder="https://..."
+          variant="favicon"
+          uploadContext={programaId ? { pathPrefix: 'favicons/programa', contextId: programaId } : undefined}
+        />
         <div className="programa-novo-actions">
           <Link to={isEdit && moduloId ? `/programas/${programaId}/modulos/${moduloId}` : `/programas/${programaId}`} className="programa-novo-btn programa-novo-btn-cancel">
             Cancelar

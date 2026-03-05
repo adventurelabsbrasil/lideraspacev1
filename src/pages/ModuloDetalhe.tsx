@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import RichTextContent from '../components/RichTextContent';
 import './Detalhe.css';
 import './ModuloDetalhe.css';
 
@@ -11,6 +12,7 @@ type Modulo = {
   id: string;
   titulo: string;
   ordem: number;
+  conteudo: string | null;
   topicos: string[];
   subtopicos: string[];
   video_youtube_embed_url: string | null;
@@ -37,7 +39,7 @@ export default function ModuloDetalhe() {
       setError(null);
       const { data: modData, error: modErr } = await supabase
         .from('modulos')
-        .select('id, titulo, ordem, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, programa_id')
+        .select('id, titulo, ordem, conteudo, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, programa_id')
         .eq('id', moduloId)
         .eq('programa_id', programaId)
         .single();
@@ -50,6 +52,7 @@ export default function ModuloDetalhe() {
       const m = modData as Modulo;
       setModulo({
         ...m,
+        conteudo: m.conteudo ?? null,
         topicos: Array.isArray(m.topicos) ? m.topicos : [],
         subtopicos: Array.isArray(m.subtopicos) ? m.subtopicos : [],
         materiais: Array.isArray(m.materiais) ? m.materiais : [],
@@ -143,7 +146,14 @@ export default function ModuloDetalhe() {
         </section>
       )}
 
-      {modulo.topicos.length > 0 && (
+      {modulo.conteudo && modulo.conteudo.trim() ? (
+        <section className="detalhe-section">
+          <h2 className="detalhe-section-title">Conteúdo</h2>
+          <RichTextContent content={modulo.conteudo} />
+        </section>
+      ) : null}
+
+      {!modulo.conteudo?.trim() && modulo.topicos.length > 0 && (
         <section className="detalhe-section">
           <h2 className="detalhe-section-title">Tópicos</h2>
           <ul className="modulo-detalhe-list">
@@ -154,7 +164,7 @@ export default function ModuloDetalhe() {
         </section>
       )}
 
-      {modulo.subtopicos.length > 0 && (
+      {!modulo.conteudo?.trim() && modulo.subtopicos.length > 0 && (
         <section className="detalhe-section">
           <h2 className="detalhe-section-title">Subtópicos</h2>
           <ul className="modulo-detalhe-list modulo-detalhe-sublist">

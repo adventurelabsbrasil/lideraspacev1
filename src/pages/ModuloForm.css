@@ -1,5 +1,23 @@
 .modulo-form-page {
-  max-width: 640px;
+  max-width: 720px;
+}
+
+.modulo-form-rich-field {
+  margin-bottom: 0.5rem;
+}
+
+.modulo-form-rich-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.modulo-form-rich-field [data-color-mode] {
+  --color-canvas-subtle: var(--input-bg);
+  --color-border-default: var(--border);
+  --color-fg-default: var(--text-primary);
+  --color-fg-muted: var(--text-muted);
+  --color-accent-fg: var(--primary);
 }
 
 .modulo-form-group {

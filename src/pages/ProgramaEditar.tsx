@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import ImageUrlOrUpload from '../components/ImageUrlOrUpload';
 import './Detalhe.css';
 import './ProgramaNovo.css';
 
@@ -114,36 +115,30 @@ export default function ProgramaEditar() {
             autoFocus
           />
         </div>
-        <div className="programa-novo-field">
-          <label htmlFor="imagem_banner_url">URL da imagem banner</label>
-          <input
-            id="imagem_banner_url"
-            type="url"
-            value={imagemBannerUrl}
-            onChange={(e) => setImagemBannerUrl(e.target.value)}
-            placeholder="https://..."
-          />
-        </div>
-        <div className="programa-novo-field">
-          <label htmlFor="favicon_programa_url">URL do favicon do programa</label>
-          <input
-            id="favicon_programa_url"
-            type="url"
-            value={faviconProgramaUrl}
-            onChange={(e) => setFaviconProgramaUrl(e.target.value)}
-            placeholder="https://..."
-          />
-        </div>
-        <div className="programa-novo-field">
-          <label htmlFor="favicon_criador_url">URL do favicon do criador</label>
-          <input
-            id="favicon_criador_url"
-            type="url"
-            value={faviconCriadorUrl}
-            onChange={(e) => setFaviconCriadorUrl(e.target.value)}
-            placeholder="https://..."
-          />
-        </div>
+        <ImageUrlOrUpload
+          label="URL da imagem banner"
+          value={imagemBannerUrl}
+          onChange={setImagemBannerUrl}
+          placeholder="https://..."
+          variant="banner"
+          uploadContext={id ? { pathPrefix: 'banners', contextId: id } : undefined}
+        />
+        <ImageUrlOrUpload
+          label="URL do favicon do programa"
+          value={faviconProgramaUrl}
+          onChange={setFaviconProgramaUrl}
+          placeholder="https://..."
+          variant="favicon"
+          uploadContext={id ? { pathPrefix: 'favicons/programa', contextId: id } : undefined}
+        />
+        <ImageUrlOrUpload
+          label="URL do favicon do criador"
+          value={faviconCriadorUrl}
+          onChange={setFaviconCriadorUrl}
+          placeholder="https://..."
+          variant="favicon"
+          uploadContext={id ? { pathPrefix: 'favicons/criador', contextId: id } : undefined}
+        />
         <div className="programa-novo-actions">
           <Link to={`/programas/${id}`} className="programa-novo-btn programa-novo-btn-cancel">Cancelar</Link>
           <button type="submit" className="programa-novo-btn programa-novo-btn-submit" disabled={submitting}>
