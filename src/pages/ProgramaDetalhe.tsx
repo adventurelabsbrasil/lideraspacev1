@@ -18,6 +18,7 @@ type Modulo = {
   id: string;
   titulo: string;
   ordem: number;
+  emoji: string | null;
 };
 
 export default function ProgramaDetalhe() {
@@ -51,7 +52,7 @@ export default function ProgramaDetalhe() {
       setPrograma(progData as Programa);
       const { data: modData, error: modErr } = await supabase
         .from('modulos')
-        .select('id, titulo, ordem')
+        .select('id, titulo, ordem, emoji')
         .eq('programa_id', id)
         .order('ordem', { ascending: true });
       if (!modErr) setModulos((modData ?? []) as Modulo[]);
@@ -135,6 +136,9 @@ export default function ProgramaDetalhe() {
                   to={`/programas/${id}/modulos/${m.id}`}
                   className="programa-detalhe-modulo-link"
                 >
+                  <span className="programa-detalhe-modulo-emoji">
+                    {m.emoji && m.emoji.trim() ? m.emoji : '📄'}
+                  </span>
                   <span className="programa-detalhe-modulo-ordem">{m.ordem}</span>
                   <span className="programa-detalhe-modulo-titulo">{m.titulo}</span>
                 </Link>

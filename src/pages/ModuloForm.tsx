@@ -34,6 +34,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const [titulo, setTitulo] = useState('');
+  const [emoji, setEmoji] = useState('');
   const [ordem, setOrdem] = useState(0);
   const [conteudo, setConteudo] = useState('');
   const [topicos, setTopicos] = useState<string[]>([]);
@@ -53,7 +54,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       setError(null);
       const { data, error: err } = await supabase
         .from('modulos')
-        .select('titulo, ordem, conteudo, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, favicon_programa_url')
+        .select('titulo, ordem, emoji, conteudo, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, favicon_programa_url')
         .eq('id', moduloId)
         .eq('programa_id', programaId)
         .single();
@@ -65,6 +66,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       const row = data as {
         titulo: string;
         ordem: number;
+        emoji: string | null;
         conteudo: string | null;
         topicos: string[];
         subtopicos: string[];
@@ -74,6 +76,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
         favicon_programa_url: string | null;
       };
       setTitulo(row.titulo ?? '');
+      setEmoji(row.emoji ?? '');
       setOrdem(row.ordem ?? 0);
       setConteudo(row.conteudo ?? '');
       setTopicos(Array.isArray(row.topicos) ? row.topicos : []);
@@ -148,6 +151,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
         .update({
           titulo: titulo.trim(),
           ordem: Number(ordem) || 0,
+          emoji: emoji.trim() || null,
           conteudo: conteudo.trim() || null,
           topicos: topicos.filter((t) => t.trim()).map((t) => t.trim()),
           subtopicos: subtopicos.filter((s) => s.trim()).map((s) => s.trim()),
@@ -171,6 +175,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
           programa_id: programaId,
           titulo: titulo.trim(),
           ordem: Number(ordem) || 0,
+          emoji: emoji.trim() || null,
           conteudo: conteudo.trim() || null,
           topicos: topicos.filter((t) => t.trim()).map((t) => t.trim()),
           subtopicos: subtopicos.filter((s) => s.trim()).map((s) => s.trim()),
@@ -225,6 +230,19 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             placeholder="Ex: Introdução"
             required
           />
+        </div>
+        <div className="programa-novo-field">
+          <label htmlFor="modulo-emoji">Emoji (opcional)</label>
+          <input
+            id="modulo-emoji"
+            type="text"
+            value={emoji}
+            onChange={(e) => setEmoji(e.target.value)}
+            placeholder="Ex: 📖 ou 🎯"
+            maxLength={4}
+            className="modulo-form-emoji-input"
+          />
+          <p className="modulo-form-rich-hint">Um emoji exibido ao lado do título do módulo (estilo Notion).</p>
         </div>
         <div className="programa-novo-field">
           <label htmlFor="modulo-ordem">Ordem</label>

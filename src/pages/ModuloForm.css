@@ -12,6 +12,12 @@
   color: var(--text-muted);
 }
 
+.modulo-form-emoji-input {
+  max-width: 4rem;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
 .modulo-form-rich-field [data-color-mode] {
   --color-canvas-subtle: var(--input-bg);
   --color-border-default: var(--border);

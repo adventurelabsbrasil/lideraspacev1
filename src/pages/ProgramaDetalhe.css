@@ -58,6 +58,12 @@
   background: var(--primary-alpha);
 }
 
+.programa-detalhe-modulo-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .programa-detalhe-modulo-ordem {
   flex-shrink: 0;
   width: 2rem;

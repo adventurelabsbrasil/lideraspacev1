@@ -1,21 +1,75 @@
-import { useState } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+import { supabase, hasSupabaseConfig } from '../lib/supabase';
 import './Layout.css';
 
+type Programa = { id: string; titulo: string };
+type Modulo = { id: string; titulo: string; ordem: number; emoji: string | null; programa_id: string };
+
 const navItems = [
-  { to: '/', label: 'Início' },
-  { to: '/programas', label: 'Meus Programas' },
-  { to: '/tarefas', label: 'Minhas Tarefas' },
-  { to: '/ativos', label: 'Meus Ativos' },
-  { to: '/ajuda', label: 'Ajuda' },
+  { to: '/', label: 'Início', icon: '🏠' },
+  { to: '/tarefas', label: 'Minhas Tarefas', icon: '✅' },
+  { to: '/ativos', label: 'Meus Ativos', icon: '📎' },
+  { to: '/ajuda', label: 'Ajuda', icon: '❓' },
 ] as const;
 
 export default function Layout() {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const [programsExpanded, setProgramsExpanded] = useState(false);
+  const [expandedProgramId, setExpandedProgramId] = useState<string | null>(null);
+  const [programas, setProgramas] = useState<Programa[]>([]);
+  const [modulosByPrograma, setModulosByPrograma] = useState<Record<string, Modulo[]>>({});
+
+  useEffect(() => {
+    if (!hasSupabaseConfig || !user) {
+      setProgramas([]);
+      setModulosByPrograma({});
+      return;
+    }
+    supabase
+      .from('programas')
+      .select('id, titulo')
+      .order('updated_at', { ascending: false })
+      .then(({ data }) => setProgramas((data ?? []) as Programa[]));
+  }, [user?.id]);
+
+  const loadModulosForProgram = async (programaId: string) => {
+    if (modulosByPrograma[programaId]) return;
+    const { data } = await supabase
+      .from('modulos')
+      .select('id, titulo, ordem, emoji, programa_id')
+      .eq('programa_id', programaId)
+      .order('ordem', { ascending: true });
+    setModulosByPrograma((prev) => ({ ...prev, [programaId]: (data ?? []) as Modulo[] }));
+  };
+
+  const toggleProgram = (programaId: string) => {
+    setExpandedProgramId((prev) => {
+      const next = prev === programaId ? null : programaId;
+      if (next) loadModulosForProgram(next);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    const m = location.pathname.match(/^\/programas\/([^/]+)(?:\/modulos\/[^/]+)?\/?$/);
+    if (m) {
+      const programaId = m[1];
+      setProgramsExpanded(true);
+      setExpandedProgramId(programaId);
+      loadModulosForProgram(programaId);
+    }
+  }, [location.pathname]);
+
+  const isProgramaActive = (id: string) => location.pathname === `/programas/${id}`;
+  const isModuloActive = (programaId: string, moduloId: string) =>
+    location.pathname === `/programas/${programaId}/modulos/${moduloId}`;
 
   const closeSidebar = () => setSidebarOpen(false);
 
@@ -75,14 +129,94 @@ export default function Layout() {
           </button>
         </div>
         <nav className="sidebar-nav">
-          {navItems.map(({ to, label }) => (
+          <NavLink
+            to="/"
+            className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+            end
+            onClick={closeSidebar}
+          >
+            <span className="sidebar-link-icon" aria-hidden>🏠</span>
+            Início
+          </NavLink>
+
+          <div className="sidebar-tree-wrap">
+            <button
+              type="button"
+              className="sidebar-tree-toggle"
+              onClick={() => setProgramsExpanded((p) => !p)}
+              aria-expanded={programsExpanded}
+            >
+              <span className={`sidebar-tree-chevron ${programsExpanded ? 'expanded' : ''}`}>▸</span>
+              <span className="sidebar-link-icon">📚</span>
+              Meus Programas
+            </button>
+            {programsExpanded && (
+              <ul className="sidebar-tree-children">
+                {programas.map((prog) => {
+                  const modulos = modulosByPrograma[prog.id] ?? [];
+                  const isExpanded = expandedProgramId === prog.id;
+                  const programActive = isProgramaActive(prog.id);
+                  return (
+                    <li key={prog.id} className="sidebar-program-wrap">
+                      <div className="sidebar-program-row" style={{ marginLeft: 'var(--space-4)' }}>
+                        <button
+                          type="button"
+                          className="sidebar-tree-chevron"
+                          style={{
+                            transform: isExpanded ? 'rotate(90deg)' : 'none',
+                            flexShrink: 0,
+                          }}
+                          onClick={() => toggleProgram(prog.id)}
+                          aria-label={isExpanded ? 'Recolher módulos' : 'Expandir módulos'}
+                        >
+                          ▸
+                        </button>
+                        <NavLink
+                          to={`/programas/${prog.id}`}
+                          className={({ isActive }) =>
+                            `sidebar-program-link ${isActive || programActive ? 'active' : ''}`
+                          }
+                          onClick={closeSidebar}
+                        >
+                          <span className="sidebar-link-icon">📁</span>
+                          <span className="sidebar-program-title">{prog.titulo}</span>
+                        </NavLink>
+                      </div>
+                      {isExpanded && (
+                        <ul className="sidebar-modules">
+                          {modulos.map((mod) => (
+                            <li key={mod.id}>
+                              <NavLink
+                                to={`/programas/${prog.id}/modulos/${mod.id}`}
+                                className={({ isActive }) =>
+                                  `sidebar-module-link ${isActive || isModuloActive(prog.id, mod.id) ? 'active' : ''}`
+                                }
+                                onClick={closeSidebar}
+                              >
+                                <span className="sidebar-module-emoji">
+                                  {mod.emoji && mod.emoji.trim() ? mod.emoji : '📄'}
+                                </span>
+                                <span className="sidebar-module-title">{mod.titulo}</span>
+                              </NavLink>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          {navItems.slice(1).map(({ to, label, icon }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-              end={to === '/'}
               onClick={closeSidebar}
             >
+              <span className="sidebar-link-icon" aria-hidden>{icon}</span>
               {label}
             </NavLink>
           ))}

@@ -6,6 +6,13 @@
   gap: 1rem;
 }
 
+.modulo-detalhe-title-emoji {
+  display: block;
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: var(--space-2);
+}
+
 .modulo-detalhe-banner-wrap {
   margin-bottom: 1.5rem;
   border-radius: var(--radius-lg);

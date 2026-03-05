@@ -1,27 +1,28 @@
-/* Light theme (default) */
+/* Light theme (default) — minimalista estilo Notion */
 :root,
 [data-theme="light"] {
-  --bg-page: #f5f5f5;
+  --bg-page: #fafafa;
   --bg-card: #ffffff;
   --bg-sidebar: #ffffff;
   --input-bg: #ffffff;
-  --text-primary: #1a1a1a;
-  --text-secondary: #555;
-  --text-muted: #888;
-  --border: #e0e0e0;
-  --hover-bg: #f0f0f0;
-  --primary: #2563eb;
+  --text-primary: #37352f;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border: #e5e7eb;
+  --border-subtle: #f3f4f6;
+  --hover-bg: #f3f4f6;
+  --primary: #2383e2;
   --primary-text: #ffffff;
   --primary-alpha: #eff6ff;
-  --focus-ring: #2563eb;
-  --focus-ring-alpha: rgba(37, 99, 235, 0.2);
+  --focus-ring: #2383e2;
+  --focus-ring-alpha: rgba(35, 131, 226, 0.15);
   --error-bg: #fef2f2;
   --error-text: #b91c1c;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-lg: 10px;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -29,6 +30,8 @@
   --space-5: 1.25rem;
   --space-6: 1.5rem;
   --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.125rem;
@@ -41,24 +44,25 @@
 
 /* Dark theme */
 [data-theme="dark"] {
-  --bg-page: #111827;
-  --bg-card: #1f2937;
-  --bg-sidebar: #1f2937;
-  --input-bg: #374151;
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --text-muted: #9ca3af;
-  --border: #374151;
-  --hover-bg: #374151;
-  --primary: #3b82f6;
+  --bg-page: #191919;
+  --bg-card: #252525;
+  --bg-sidebar: #252525;
+  --input-bg: #2f2f2f;
+  --text-primary: #ebebeb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --border: #373737;
+  --border-subtle: #2f2f2f;
+  --hover-bg: #373737;
+  --primary: #4a9eff;
   --primary-text: #ffffff;
-  --primary-alpha: rgba(59, 130, 246, 0.2);
-  --focus-ring: #60a5fa;
-  --focus-ring-alpha: rgba(59, 130, 246, 0.3);
+  --primary-alpha: rgba(74, 158, 255, 0.18);
+  --focus-ring: #4a9eff;
+  --focus-ring-alpha: rgba(74, 158, 255, 0.25);
   --error-bg: #450a0a;
   --error-text: #fca5a5;
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 *,
@@ -68,8 +72,8 @@
 }
 
 html {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.5;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
   color: var(--text-primary);
   background: var(--bg-page);
 }

@@ -12,6 +12,7 @@ type Modulo = {
   id: string;
   titulo: string;
   ordem: number;
+  emoji: string | null;
   conteudo: string | null;
   topicos: string[];
   subtopicos: string[];
@@ -39,7 +40,7 @@ export default function ModuloDetalhe() {
       setError(null);
       const { data: modData, error: modErr } = await supabase
         .from('modulos')
-        .select('id, titulo, ordem, conteudo, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, programa_id')
+        .select('id, titulo, ordem, emoji, conteudo, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, programa_id')
         .eq('id', moduloId)
         .eq('programa_id', programaId)
         .single();
@@ -118,6 +119,9 @@ export default function ModuloDetalhe() {
       )}
       <header className="detalhe-header">
         <div className="detalhe-header-main">
+          {modulo.emoji && modulo.emoji.trim() && (
+            <span className="modulo-detalhe-title-emoji" aria-hidden>{modulo.emoji}</span>
+          )}
           <h1 className="detalhe-title">{modulo.titulo}</h1>
           <p className="detalhe-meta">Módulo {modulo.ordem}</p>
         </div>
