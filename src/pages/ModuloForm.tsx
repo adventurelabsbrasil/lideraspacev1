@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import MDEditor from '@uiw/react-md-editor';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
 import { supabase } from '../lib/supabase';
 import ImageUrlOrUpload from '../components/ImageUrlOrUpload';
+import BlockEditor, { type Block } from '../components/BlockEditor';
 import './Detalhe.css';
 import './ProgramaNovo.css';
 import './ModuloForm.css';
-import '@uiw/react-md-editor/markdown-editor.css';
 
 type MaterialItem = { url: string; label: string; icon: string };
 
@@ -28,18 +26,20 @@ type Props = {
 
 export default function ModuloForm({ programaId, moduloId }: Props) {
   const navigate = useNavigate();
-  const { theme } = useTheme();
   const { user } = useAuth();
   const isEdit = Boolean(moduloId);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [availableParents, setAvailableParents] = useState<{ id: string; titulo: string }[]>([]);
 
   const [titulo, setTitulo] = useState('');
   const [emoji, setEmoji] = useState('');
   const [ordem, setOrdem] = useState(0);
-  const [conteudo, setConteudo] = useState('');
+  const [parentId, setParentId] = useState('');
+  const [descricao, setDescricao] = useState('');
+  const [blocos, setBlocos] = useState<Block[]>([]);
   const [topicos, setTopicos] = useState<string[]>([]);
   const [subtopicos, setSubtopicos] = useState<string[]>([]);
   const [videoYoutubeUrl, setVideoYoutubeUrl] = useState('');
@@ -70,10 +70,17 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
         setIsAdmin(false);
       }
 
+      let query = supabase.from('modulos').select('id, titulo').eq('programa_id', programaId);
+      if (moduloId) {
+        query = query.neq('id', moduloId);
+      }
+      const { data: parentsData } = await query;
+      setAvailableParents(parentsData || []);
+
       if (isEdit && moduloId) {
         const { data, error: err } = await supabase
           .from('modulos')
-          .select('titulo, ordem, emoji, conteudo, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, favicon_programa_url')
+          .select('titulo, ordem, emoji, parent_id, descricao, blocos, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, favicon_programa_url')
           .eq('id', moduloId)
           .eq('programa_id', programaId)
           .single();
@@ -82,22 +89,13 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
           setLoading(false);
           return;
         }
-        const row = data as {
-          titulo: string;
-          ordem: number;
-          emoji: string | null;
-          conteudo: string | null;
-          topicos: string[];
-          subtopicos: string[];
-          video_youtube_embed_url: string | null;
-          materiais: MaterialItem[] | null;
-          imagem_banner_url: string | null;
-          favicon_programa_url: string | null;
-        };
+        const row = data as any;
         setTitulo(row.titulo ?? '');
         setEmoji(row.emoji ?? '');
         setOrdem(row.ordem ?? 0);
-        setConteudo(row.conteudo ?? '');
+        setParentId(row.parent_id ?? '');
+        setDescricao(row.descricao ?? '');
+        setBlocos(Array.isArray(row.blocos) ? row.blocos : []);
         setTopicos(Array.isArray(row.topicos) ? row.topicos : []);
         setSubtopicos(Array.isArray(row.subtopicos) ? row.subtopicos : []);
         setVideoYoutubeUrl(row.video_youtube_embed_url ?? '');
@@ -110,52 +108,28 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
     load();
   }, [programaId, moduloId, isEdit, user?.id]);
 
-  function addTopico() {
-    setTopicos((prev) => [...prev, '']);
-  }
+  function addTopico() { setTopicos((prev) => [...prev, '']); }
   function setTopicoAt(i: number, v: string) {
-    setTopicos((prev) => {
-      const next = [...prev];
-      next[i] = v;
-      return next;
-    });
+    setTopicos((prev) => { const next = [...prev]; next[i] = v; return next; });
   }
-  function removeTopico(i: number) {
-    setTopicos((prev) => prev.filter((_, j) => j !== i));
-  }
+  function removeTopico(i: number) { setTopicos((prev) => prev.filter((_, j) => j !== i)); }
 
-  function addSubtopicos() {
-    setSubtopicos((prev) => [...prev, '']);
-  }
+  function addSubtopicos() { setSubtopicos((prev) => [...prev, '']); }
   function setSubtopicAt(i: number, v: string) {
-    setSubtopicos((prev) => {
-      const next = [...prev];
-      next[i] = v;
-      return next;
-    });
+    setSubtopicos((prev) => { const next = [...prev]; next[i] = v; return next; });
   }
-  function removeSubtopic(i: number) {
-    setSubtopicos((prev) => prev.filter((_, j) => j !== i));
-  }
+  function removeSubtopic(i: number) { setSubtopicos((prev) => prev.filter((_, j) => j !== i)); }
 
-  function addMaterial() {
-    setMateriais((prev) => [...prev, { url: '', label: '', icon: 'link' }]);
-  }
+  function addMaterial() { setMateriais((prev) => [...prev, { url: '', label: '', icon: 'link' }]); }
   function setMaterialAt(i: number, field: keyof MaterialItem, value: string) {
-    setMateriais((prev) => {
-      const next = [...prev];
-      next[i] = { ...next[i], [field]: value };
-      return next;
-    });
+    setMateriais((prev) => { const next = [...prev]; next[i] = { ...next[i], [field]: value }; return next; });
   }
-  function removeMaterial(i: number) {
-    setMateriais((prev) => prev.filter((_, j) => j !== i));
-  }
+  function removeMaterial(i: number) { setMateriais((prev) => prev.filter((_, j) => j !== i)); }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!titulo.trim()) {
-      setError('Informe o título do módulo.');
+      setError('Informe o título da página.');
       return;
     }
     const embedUrl = videoYoutubeUrl.trim() ? youtubeToEmbedUrl(videoYoutubeUrl) : null;
@@ -166,21 +140,25 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
     setError(null);
     setSubmitting(true);
 
+    const payload = {
+      titulo: titulo.trim(),
+      ordem: Number(ordem) || 0,
+      emoji: emoji.trim() || null,
+      parent_id: parentId || null,
+      descricao: descricao.trim() || null,
+      blocos: blocos,
+      topicos: topicos.filter((t) => t.trim()).map((t) => t.trim()),
+      subtopicos: subtopicos.filter((s) => s.trim()).map((s) => s.trim()),
+      video_youtube_embed_url: embedUrl,
+      materiais: materiaisClean,
+      imagem_banner_url: imagemBannerUrl.trim() || null,
+      favicon_programa_url: faviconProgramaUrl.trim() || null,
+    };
+
     if (isEdit && moduloId) {
       const { error: err } = await supabase
         .from('modulos')
-        .update({
-          titulo: titulo.trim(),
-          ordem: Number(ordem) || 0,
-          emoji: emoji.trim() || null,
-          conteudo: conteudo.trim() || null,
-          topicos: topicos.filter((t) => t.trim()).map((t) => t.trim()),
-          subtopicos: subtopicos.filter((s) => s.trim()).map((s) => s.trim()),
-          video_youtube_embed_url: embedUrl,
-          materiais: materiaisClean,
-          imagem_banner_url: imagemBannerUrl.trim() || null,
-          favicon_programa_url: faviconProgramaUrl.trim() || null,
-        })
+        .update(payload)
         .eq('id', moduloId)
         .eq('programa_id', programaId);
       setSubmitting(false);
@@ -192,24 +170,12 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
     } else {
       const { data, error: err } = await supabase
         .from('modulos')
-        .insert({
-          programa_id: programaId,
-          titulo: titulo.trim(),
-          ordem: Number(ordem) || 0,
-          emoji: emoji.trim() || null,
-          conteudo: conteudo.trim() || null,
-          topicos: topicos.filter((t) => t.trim()).map((t) => t.trim()),
-          subtopicos: subtopicos.filter((s) => s.trim()).map((s) => s.trim()),
-          video_youtube_embed_url: embedUrl,
-          materiais: materiaisClean,
-          imagem_banner_url: imagemBannerUrl.trim() || null,
-          favicon_programa_url: faviconProgramaUrl.trim() || null,
-        })
+        .insert({ ...payload, programa_id: programaId })
         .select('id')
         .single();
       setSubmitting(false);
       if (err) {
-        setError(err.message ?? 'Erro ao criar módulo.');
+        setError(err.message ?? 'Erro ao criar página.');
         return;
       }
       if (data?.id) navigate(`/programas/${programaId}/modulos/${data.id}`);
@@ -229,7 +195,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
     return (
       <div className="page-content programa-novo-page">
         <div className="programa-novo-empty">
-          <p>Você precisa ser <strong>admin</strong> para editar ou criar módulos.</p>
+          <p>Você precisa ser <strong>lidera_admin</strong> para editar ou criar páginas.</p>
           <Link to={`/programas/${programaId}`} className="programa-novo-link">← Voltar ao programa</Link>
         </div>
       </div>
@@ -243,15 +209,16 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
         <span className="detalhe-breadcrumb-sep">/</span>
         <Link to={`/programas/${programaId}`}>Programa</Link>
         <span className="detalhe-breadcrumb-sep">/</span>
-        <span>{isEdit ? 'Editar módulo' : 'Novo módulo'}</span>
+        <span>{isEdit ? 'Editar Página' : 'Nova Página'}</span>
       </nav>
-      <h1 className="programa-novo-title">{isEdit ? 'Editar módulo' : 'Novo módulo'}</h1>
+      <h1 className="programa-novo-title">{isEdit ? 'Editar Página' : 'Nova Página'}</h1>
       <p className="programa-novo-desc">
-        {isEdit ? 'Altere os dados do módulo.' : 'Preencha os dados para criar um novo módulo.'}
+        {isEdit ? 'Altere os dados da página.' : 'Preencha os dados para criar uma nova página (módulo).'}
       </p>
 
       <form onSubmit={handleSubmit} className="programa-novo-form modulo-form">
         {error && <p className="programa-novo-error" role="alert">{error}</p>}
+        
         <div className="programa-novo-field">
           <label htmlFor="modulo-titulo">Título *</label>
           <input
@@ -259,10 +226,11 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             type="text"
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
-            placeholder="Ex: Introdução"
+            placeholder="Ex: Introdução ao Lidera"
             required
           />
         </div>
+        
         <div className="programa-novo-field">
           <label htmlFor="modulo-emoji">Emoji (opcional)</label>
           <input
@@ -274,10 +242,25 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             maxLength={4}
             className="modulo-form-emoji-input"
           />
-          <p className="modulo-form-rich-hint">Um emoji exibido ao lado do título do módulo (estilo Notion).</p>
         </div>
+
         <div className="programa-novo-field">
-          <label htmlFor="modulo-ordem">Ordem</label>
+          <label htmlFor="modulo-parent">Página Pai (opcional - para hierarquia)</label>
+          <select
+            id="modulo-parent"
+            value={parentId}
+            onChange={(e) => setParentId(e.target.value)}
+            className="input-select"
+          >
+            <option value="">-- Nenhuma (Raiz) --</option>
+            {availableParents.map(p => (
+              <option key={p.id} value={p.id}>{p.titulo}</option>
+            ))}
+          </select>
+        </div>
+        
+        <div className="programa-novo-field">
+          <label htmlFor="modulo-ordem">Ordem (Posição)</label>
           <input
             id="modulo-ordem"
             type="number"
@@ -286,6 +269,18 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             onChange={(e) => setOrdem(Number(e.target.value) || 0)}
           />
         </div>
+
+        <div className="programa-novo-field">
+          <label>Descrição Curta</label>
+          <textarea
+            className="input-textarea"
+            placeholder="Um breve resumo sobre o conteúdo desta página..."
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            rows={3}
+          />
+        </div>
+
         <div className="programa-novo-field">
           <label>URL do vídeo (YouTube)</label>
           <input
@@ -295,64 +290,15 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             placeholder="https://www.youtube.com/watch?v=..."
           />
         </div>
-        <div className="programa-novo-field modulo-form-rich-field">
-          <label>Conteúdo (rich text)</label>
-          <p className="modulo-form-rich-hint">Use a barra de ferramentas para negrito, itálico, listas, links e tabelas.</p>
-          <div data-color-mode={theme}>
-            <MDEditor
-              value={conteudo}
-              onChange={(v) => setConteudo(v ?? '')}
-              height={280}
-              preview="live"
-              visibleDragbar={false}
-            />
-          </div>
+
+        <div className="programa-novo-field modulo-form-rich-field" style={{ marginTop: 'var(--space-4)' }}>
+          <label>Área de Conteúdo Livre (Blocos Dinâmicos)</label>
+          <BlockEditor blocks={blocos} onChange={setBlocos} />
         </div>
+
         <div className="modulo-form-group">
           <div className="modulo-form-group-header">
-            <label>Tópicos (opcional, legado)</label>
-            <button type="button" className="modulo-form-add-btn" onClick={addTopico}>
-              + Adicionar
-            </button>
-          </div>
-          {topicos.map((t, i) => (
-            <div key={i} className="modulo-form-row">
-              <input
-                type="text"
-                value={t}
-                onChange={(e) => setTopicoAt(i, e.target.value)}
-                placeholder="Tópico"
-              />
-              <button type="button" className="modulo-form-remove-btn" onClick={() => removeTopico(i)} aria-label="Remover">
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className="modulo-form-group">
-          <div className="modulo-form-group-header">
-            <label>Subtópicos</label>
-            <button type="button" className="modulo-form-add-btn" onClick={addSubtopicos}>
-              + Adicionar
-            </button>
-          </div>
-          {subtopicos.map((s, i) => (
-            <div key={i} className="modulo-form-row">
-              <input
-                type="text"
-                value={s}
-                onChange={(e) => setSubtopicAt(i, e.target.value)}
-                placeholder="Subtópico"
-              />
-              <button type="button" className="modulo-form-remove-btn" onClick={() => removeSubtopic(i)} aria-label="Remover">
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className="modulo-form-group">
-          <div className="modulo-form-group-header">
-            <label>Materiais (links)</label>
+            <label>Materiais Anexos</label>
             <button type="button" className="modulo-form-add-btn" onClick={addMaterial}>
               + Adicionar
             </button>
@@ -387,28 +333,51 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             </div>
           ))}
         </div>
+
         <ImageUrlOrUpload
-          label="URL da imagem banner do módulo"
+          label="URL da imagem banner da página"
           value={imagemBannerUrl}
           onChange={setImagemBannerUrl}
           placeholder="https://..."
           variant="banner"
           uploadContext={moduloId ? { pathPrefix: 'modulos/banner', contextId: moduloId } : undefined}
         />
-        <ImageUrlOrUpload
-          label="URL do favicon do programa (módulo)"
-          value={faviconProgramaUrl}
-          onChange={setFaviconProgramaUrl}
-          placeholder="https://..."
-          variant="favicon"
-          uploadContext={programaId ? { pathPrefix: 'favicons/programa', contextId: programaId } : undefined}
-        />
+        
+        <div className="modulo-form-group" style={{ marginTop: 'var(--space-8)' }}>
+          <details>
+            <summary style={{ cursor: 'pointer', fontWeight: 500 }}>Campos Legados (Tópicos/Subtópicos)</summary>
+            <div style={{ marginTop: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <div className="modulo-form-group-header">
+                <label>Tópicos</label>
+                <button type="button" className="modulo-form-add-btn" onClick={addTopico}>+ Adicionar</button>
+              </div>
+              {topicos.map((t, i) => (
+                <div key={i} className="modulo-form-row">
+                  <input type="text" value={t} onChange={(e) => setTopicoAt(i, e.target.value)} placeholder="Tópico" />
+                  <button type="button" className="modulo-form-remove-btn" onClick={() => removeTopico(i)}>×</button>
+                </div>
+              ))}
+
+              <div className="modulo-form-group-header">
+                <label>Subtópicos</label>
+                <button type="button" className="modulo-form-add-btn" onClick={addSubtopicos}>+ Adicionar</button>
+              </div>
+              {subtopicos.map((s, i) => (
+                <div key={i} className="modulo-form-row">
+                  <input type="text" value={s} onChange={(e) => setSubtopicAt(i, e.target.value)} placeholder="Subtópico" />
+                  <button type="button" className="modulo-form-remove-btn" onClick={() => removeSubtopic(i)}>×</button>
+                </div>
+              ))}
+            </div>
+          </details>
+        </div>
+
         <div className="programa-novo-actions">
           <Link to={isEdit && moduloId ? `/programas/${programaId}/modulos/${moduloId}` : `/programas/${programaId}`} className="programa-novo-btn programa-novo-btn-cancel">
             Cancelar
           </Link>
           <button type="submit" className="programa-novo-btn programa-novo-btn-submit" disabled={submitting}>
-            {submitting ? 'Salvando…' : isEdit ? 'Salvar' : 'Criar módulo'}
+            {submitting ? 'Salvando…' : isEdit ? 'Salvar' : 'Criar Página'}
           </button>
         </div>
       </form>
