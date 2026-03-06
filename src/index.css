@@ -45,7 +45,6 @@
 }
 
 /* Original theme (Lidera Experience - Premium UI) */
-:root,
 [data-theme="original"] {
   --bg-page: #0a1128;
   --bg-page-gradient: radial-gradient(circle at top center, #13224a 0%, #0a1128 100%);
@@ -92,7 +91,7 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   --font-family-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-family-serif: "Playfair Display", Georgia, serif;
+  --font-family-serif: var(--font-family-sans);
 }
 
 *,
