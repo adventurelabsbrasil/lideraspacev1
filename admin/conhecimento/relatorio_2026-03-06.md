@@ -6,29 +6,23 @@
 
 ## 🚀 Resumo das Implementações de Hoje
 
-Hoje focamos em estruturar a governança de acesso (Roles), criar o perfil do usuário matriculado e refinar a experiência visual (UX) para torná-la mais profissional e próxima ao estilo "Notion".
+Hoje focamos em duas grandes frentes para transformar o LideraSpace em uma plataforma de alto padrão e experiência imersiva: 
 
-### 1. Governança de Acesso e Papéis (Roles)
-Atualizamos o sistema de permissões para suportar três níveis reais de acesso:
-- **`lidera_admin` (Dono da Lidera):** Possui controle total. É o único que vê botões de "Novo Programa", "Novo Módulo" e "Editar". Pode gerenciar todos os materiais, vídeos e conteúdos.
-- **`org_admin` (Dono da Organização Cliente):** Acesso de visualização e gestão para a empresa que adquiriu a consultoria. Pode acompanhar o progresso e visualizar conteúdos.
-- **`aluno` (Matriculado):** Acesso focado no consumo das aulas e conclusão de tarefas.
+### PARTE 1: Governança, Perfis e UI Premium (Lidera Experience)
+- **Governança de Acesso e Papéis (Roles):** Implementação de 3 níveis de acesso estruturados (`lidera_admin`, `org_admin`, `aluno`), com proteção de telas e ações de edição.
+- **Perfil do Matriculado:** Criação da página "Meu Perfil" com upload de avatar no Supabase Storage e atualização de identidade na Sidebar.
+- **Identidade Visual Premium:** Implementação do tema "Original" com fundo Deep Navy Blue (gradiente e textura de ruído), acentos em Dourado Metálico, e uso intensivo de *Glassmorphism* (efeito de vidro fosco) em cards e formulários. Toggle de temas (✨ Original, 🌙 Dark, ☀️ Light).
+- **Tipografia Elegante:** Inclusão da fonte *Playfair Display* para títulos em contraste com a *Inter* para os textos corporativos.
 
-### 2. Perfil do Matriculado
-Implementamos a área de perfil para que cada usuário tenha sua identidade no app:
-- **Página de Perfil:** Adicionada rota `/perfil` onde o usuário pode alterar seu nome completo e foto de perfil.
-- **Integração com Supabase Storage:** Criamos o bucket `avatars` para armazenamento seguro das fotos.
-- **Identidade Visual na Sidebar:** O menu lateral agora exibe a foto do usuário e seu nome/email de forma personalizada na base, com link direto para edição.
+### PARTE 2: Arquitetura de Conteúdo Dinâmico (Estilo Notion)
+- **Editor de Blocos Dinâmico:** Substituição do editor estático de Markdown por um sistema construtor de blocos independentes. O admin pode inserir blocos customizados de: Título, Texto, Link, Vídeo, Tarefa (Checklist) e apontamento para Subpáginas.
+- **Páginas Hierárquicas Infinitas:** Alteração no banco de dados (`parent_id`) para suportar a criação de módulos/páginas dentro de outras páginas, permitindo uma organização profunda.
+- **Estado do Aluno Persistente:** Criação da tabela `aluno_modulo_state` para salvar separadamente, e com segurança (RLS), o progresso das tarefas (checklist) e as anotações privadas do aluno dentro de cada página.
+- **Melhoria da Leitura:** Visualização de anexos e subpáginas em grids organizados com cards interativos.
 
-### 3. UX/UI Estilo Notion (Materiais e Módulos)
-Refinamos a visualização de conteúdos para um visual "clean" e iconizado:
-- **Materiais:** Os links de materiais (Planilhas, PDFs, Docs) agora aparecem em cards iconizados com efeitos de hover (shadow e flutuação), idênticos aos blocos de arquivos do Notion.
-- **Player de Vídeo:** O campo de URL do YouTube no cadastro do módulo agora renderiza automaticamente um player embed na tela de detalhe.
-- **Visualização de Leitura:** Para usuários sem permissão de admin, as telas de edição são bloqueadas e a interface de visualização é otimizada para leitura.
-
-### 4. Infraestrutura Supabase
-- Criada a migration `004_profiles_and_roles.sql` que automatiza a criação da tabela de perfis e a configuração de segurança (RLS).
-- Atualizamos as políticas de storage para permitir que usuários autenticados gerenciem seus próprios avatares.
+### Infraestrutura Supabase (Migrations Geradas)
+- `004_profiles_and_roles.sql`: Criação da tabela de perfis, storage `avatars` e nova estrutura de roles em `organization_members`.
+- `005_notion_blocks_and_hierarchy.sql`: Suporte à hierarquia de páginas (`parent_id`), armazenamento JSONB para array de `blocos` dinâmicos e nova tabela do estado do aluno.
 
 ---
 *Relatório gerado automaticamente pelo Gemini CLI para a pasta de conhecimento da Adventure Labs.*
