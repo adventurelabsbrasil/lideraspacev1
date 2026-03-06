@@ -29,6 +29,7 @@ export default function ModuloDetalhe() {
   const [programaTitulo, setProgramaTitulo] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (!moduloId || !programaId) {
@@ -60,10 +61,23 @@ export default function ModuloDetalhe() {
       });
       const { data: progData } = await supabase
         .from('programas')
-        .select('titulo')
+        .select('titulo, organization_id')
         .eq('id', programaId)
         .single();
-      setProgramaTitulo((progData as { titulo?: string } | null)?.titulo ?? 'Programa');
+      
+      const prog = progData as { titulo?: string; organization_id?: string } | null;
+      setProgramaTitulo(prog?.titulo ?? 'Programa');
+
+      if (user?.id && prog?.organization_id) {
+        const { data: orgMember } = await supabase
+          .from('organization_members')
+          .select('role')
+          .eq('organization_id', prog.organization_id)
+          .eq('user_id', user.id)
+          .single();
+        setIsAdmin(orgMember?.role === 'lidera_admin');
+      }
+
       setLoading(false);
     }
     load();
@@ -125,7 +139,7 @@ export default function ModuloDetalhe() {
           <h1 className="detalhe-title">{modulo.titulo}</h1>
           <p className="detalhe-meta">Módulo {modulo.ordem}</p>
         </div>
-        {user && (
+        {isAdmin && (
           <Link
             to={`/programas/${programaId}/modulos/${moduloId}/editar`}
             className="btn btn--secondary"

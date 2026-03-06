@@ -35,6 +35,7 @@ export default function Login() {
     const { error: err } = await signInWithGoogle();
     setSubmitting(false);
     if (err) {
+      // "Unrecognized client_id" = configurar Google em Supabase Dashboard → Auth → Providers → Google
       setError(err.message ?? 'Erro ao entrar com Google.');
     }
   }

@@ -13,6 +13,7 @@ export default function ProgramaEditar() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   const [titulo, setTitulo] = useState('');
   const [imagemBannerUrl, setImagemBannerUrl] = useState('');
@@ -29,22 +30,36 @@ export default function ProgramaEditar() {
       setError(null);
       const { data, error: err } = await supabase
         .from('programas')
-        .select('id, titulo, imagem_banner_url, favicon_programa_url, favicon_criador_url')
+        .select('id, organization_id, titulo, imagem_banner_url, favicon_programa_url, favicon_criador_url')
         .eq('id', id)
         .single();
-      setLoading(false);
+      
       if (err || !data) {
         setError(err?.message ?? 'Programa não encontrado.');
+        setLoading(false);
         return;
       }
-      const row = data as { titulo: string; imagem_banner_url?: string | null; favicon_programa_url?: string | null; favicon_criador_url?: string | null };
+      const row = data as { organization_id: string; titulo: string; imagem_banner_url?: string | null; favicon_programa_url?: string | null; favicon_criador_url?: string | null };
       setTitulo(row.titulo ?? '');
       setImagemBannerUrl(row.imagem_banner_url ?? '');
       setFaviconProgramaUrl(row.favicon_programa_url ?? '');
       setFaviconCriadorUrl(row.favicon_criador_url ?? '');
+
+      if (user?.id && row.organization_id) {
+        const { data: orgMember } = await supabase
+          .from('organization_members')
+          .select('role')
+          .eq('organization_id', row.organization_id)
+          .eq('user_id', user.id)
+          .single();
+        setIsAdmin(orgMember?.role === 'lidera_admin');
+      } else {
+        setIsAdmin(false);
+      }
+      setLoading(false);
     }
     load();
-  }, [id]);
+  }, [id, user?.id]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -85,6 +100,17 @@ export default function ProgramaEditar() {
     return (
       <div className="page-content programa-novo-page">
         <p className="programa-novo-loading">Carregando…</p>
+      </div>
+    );
+  }
+
+  if (isAdmin === false) {
+    return (
+      <div className="page-content programa-novo-page">
+        <div className="programa-novo-empty">
+          <p>Você precisa ser <strong>admin</strong> para editar programas.</p>
+          <Link to={`/programas/${id}`} className="programa-novo-link">← Voltar ao programa</Link>
+        </div>
       </div>
     );
   }

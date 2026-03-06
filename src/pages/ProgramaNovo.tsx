@@ -30,7 +30,7 @@ export default function ProgramaNovo() {
         .from('organization_members')
         .select('organization_id, organizations(id, nome)')
         .eq('user_id', user.id)
-        .eq('role', 'admin');
+        .eq('role', 'lidera_admin');
       setLoadingOrgs(false);
       if (err) {
         setError('Não foi possível carregar as organizações.');
@@ -100,8 +100,8 @@ export default function ProgramaNovo() {
         <p className="programa-novo-loading">Carregando organizações…</p>
       ) : organizations.length === 0 ? (
         <div className="programa-novo-empty">
-          <p>Você precisa ser <strong>admin</strong> de uma organização para criar programas.</p>
-          <p>Crie uma organização ou peça que um administrador adicione você como admin.</p>
+          <p>Você precisa ser <strong>Dono da Lidera</strong> (lidera_admin) de uma organização para criar programas.</p>
+          <p>Crie uma organização ou peça que um administrador adicione você como lidera_admin.</p>
           <Link to="/programas" className="programa-novo-link">← Voltar aos programas</Link>
         </div>
       ) : (

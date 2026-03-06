@@ -25,13 +25,24 @@ export default function Layout() {
   const [expandedProgramId, setExpandedProgramId] = useState<string | null>(null);
   const [programas, setProgramas] = useState<Programa[]>([]);
   const [modulosByPrograma, setModulosByPrograma] = useState<Record<string, Modulo[]>>({});
+  
+  const [profile, setProfile] = useState<{ nome_completo?: string; avatar_url?: string } | null>(null);
 
   useEffect(() => {
     if (!hasSupabaseConfig || !user) {
       setProgramas([]);
       setModulosByPrograma({});
+      setProfile(null);
       return;
     }
+    
+    supabase
+      .from('profiles')
+      .select('nome_completo, avatar_url')
+      .eq('id', user.id)
+      .single()
+      .then(({ data }) => setProfile(data));
+
     supabase
       .from('programas')
       .select('id, titulo')
@@ -222,9 +233,27 @@ export default function Layout() {
           ))}
         </nav>
         <div className="sidebar-footer">
-          <span className="sidebar-user" title={user?.email ?? ''}>
-            {user?.email ?? 'Usuário'}
-          </span>
+          <NavLink
+            to="/perfil"
+            className={({ isActive }) => `sidebar-user-link ${isActive ? 'active' : ''}`}
+            onClick={closeSidebar}
+          >
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Avatar" className="sidebar-user-avatar" />
+            ) : (
+              <span className="sidebar-user-avatar-placeholder">
+                {(profile?.nome_completo || user?.email || '?').charAt(0).toUpperCase()}
+              </span>
+            )}
+            <div className="sidebar-user-info">
+              <span className="sidebar-user-name" title={profile?.nome_completo || user?.email || ''}>
+                {profile?.nome_completo || user?.email?.split('@')[0] || 'Usuário'}
+              </span>
+              <span className="sidebar-user-email" title={user?.email || ''}>
+                {user?.email || ''}
+              </span>
+            </div>
+          </NavLink>
           <button type="button" className="sidebar-logout" onClick={() => { signOut(); closeSidebar(); }}>
             Sair
           </button>

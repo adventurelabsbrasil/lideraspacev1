@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import MDEditor from '@uiw/react-md-editor';
+import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { supabase } from '../lib/supabase';
 import ImageUrlOrUpload from '../components/ImageUrlOrUpload';
@@ -28,10 +29,12 @@ type Props = {
 export default function ModuloForm({ programaId, moduloId }: Props) {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { user } = useAuth();
   const isEdit = Boolean(moduloId);
-  const [loading, setLoading] = useState(isEdit);
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   const [titulo, setTitulo] = useState('');
   const [emoji, setEmoji] = useState('');
@@ -45,49 +48,67 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
   const [faviconProgramaUrl, setFaviconProgramaUrl] = useState('');
 
   useEffect(() => {
-    if (!isEdit || !moduloId) {
-      if (!isEdit) setLoading(false);
-      return;
-    }
     async function load() {
       setLoading(true);
       setError(null);
-      const { data, error: err } = await supabase
-        .from('modulos')
-        .select('titulo, ordem, emoji, conteudo, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, favicon_programa_url')
-        .eq('id', moduloId)
-        .eq('programa_id', programaId)
+      
+      const { data: progData } = await supabase
+        .from('programas')
+        .select('organization_id')
+        .eq('id', programaId)
         .single();
-      setLoading(false);
-      if (err || !data) {
-        setError(err?.message ?? 'Módulo não encontrado.');
-        return;
+
+      if (user?.id && progData?.organization_id) {
+        const { data: orgMember } = await supabase
+          .from('organization_members')
+          .select('role')
+          .eq('organization_id', progData.organization_id)
+          .eq('user_id', user.id)
+          .single();
+        setIsAdmin(orgMember?.role === 'lidera_admin');
+      } else {
+        setIsAdmin(false);
       }
-      const row = data as {
-        titulo: string;
-        ordem: number;
-        emoji: string | null;
-        conteudo: string | null;
-        topicos: string[];
-        subtopicos: string[];
-        video_youtube_embed_url: string | null;
-        materiais: MaterialItem[] | null;
-        imagem_banner_url: string | null;
-        favicon_programa_url: string | null;
-      };
-      setTitulo(row.titulo ?? '');
-      setEmoji(row.emoji ?? '');
-      setOrdem(row.ordem ?? 0);
-      setConteudo(row.conteudo ?? '');
-      setTopicos(Array.isArray(row.topicos) ? row.topicos : []);
-      setSubtopicos(Array.isArray(row.subtopicos) ? row.subtopicos : []);
-      setVideoYoutubeUrl(row.video_youtube_embed_url ?? '');
-      setMateriais(Array.isArray(row.materiais) ? row.materiais : []);
-      setImagemBannerUrl(row.imagem_banner_url ?? '');
-      setFaviconProgramaUrl(row.favicon_programa_url ?? '');
+
+      if (isEdit && moduloId) {
+        const { data, error: err } = await supabase
+          .from('modulos')
+          .select('titulo, ordem, emoji, conteudo, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, favicon_programa_url')
+          .eq('id', moduloId)
+          .eq('programa_id', programaId)
+          .single();
+        if (err || !data) {
+          setError(err?.message ?? 'Módulo não encontrado.');
+          setLoading(false);
+          return;
+        }
+        const row = data as {
+          titulo: string;
+          ordem: number;
+          emoji: string | null;
+          conteudo: string | null;
+          topicos: string[];
+          subtopicos: string[];
+          video_youtube_embed_url: string | null;
+          materiais: MaterialItem[] | null;
+          imagem_banner_url: string | null;
+          favicon_programa_url: string | null;
+        };
+        setTitulo(row.titulo ?? '');
+        setEmoji(row.emoji ?? '');
+        setOrdem(row.ordem ?? 0);
+        setConteudo(row.conteudo ?? '');
+        setTopicos(Array.isArray(row.topicos) ? row.topicos : []);
+        setSubtopicos(Array.isArray(row.subtopicos) ? row.subtopicos : []);
+        setVideoYoutubeUrl(row.video_youtube_embed_url ?? '');
+        setMateriais(Array.isArray(row.materiais) ? row.materiais : []);
+        setImagemBannerUrl(row.imagem_banner_url ?? '');
+        setFaviconProgramaUrl(row.favicon_programa_url ?? '');
+      }
+      setLoading(false);
     }
     load();
-  }, [programaId, moduloId, isEdit]);
+  }, [programaId, moduloId, isEdit, user?.id]);
 
   function addTopico() {
     setTopicos((prev) => [...prev, '']);
@@ -200,6 +221,17 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
     return (
       <div className="page-content programa-novo-page">
         <p className="programa-novo-loading">Carregando…</p>
+      </div>
+    );
+  }
+
+  if (isAdmin === false) {
+    return (
+      <div className="page-content programa-novo-page">
+        <div className="programa-novo-empty">
+          <p>Você precisa ser <strong>admin</strong> para editar ou criar módulos.</p>
+          <Link to={`/programas/${programaId}`} className="programa-novo-link">← Voltar ao programa</Link>
+        </div>
       </div>
     );
   }

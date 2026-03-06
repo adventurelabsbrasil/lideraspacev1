@@ -15,6 +15,7 @@ import TarefaDetalhe from './pages/TarefaDetalhe';
 import MeusAtivos from './pages/MeusAtivos';
 import AtivoDetalhe from './pages/AtivoDetalhe';
 import Ajuda from './pages/Ajuda';
+import Perfil from './pages/Perfil';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
         }
       >
         <Route index element={<Inicio />} />
+        <Route path="perfil" element={<Perfil />} />
         <Route path="programas" element={<MeusProgramas />} />
         <Route path="programas/novo" element={<ProgramaNovo />} />
         <Route path="programas/:id/editar" element={<ProgramaEditar />} />

@@ -28,6 +28,7 @@ export default function ProgramaDetalhe() {
   const [modulos, setModulos] = useState<Modulo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -39,7 +40,7 @@ export default function ProgramaDetalhe() {
       setError(null);
       const { data: progData, error: progErr } = await supabase
         .from('programas')
-        .select('id, titulo, imagem_banner_url, favicon_programa_url, created_at, updated_at')
+        .select('id, organization_id, titulo, imagem_banner_url, favicon_programa_url, created_at, updated_at')
         .eq('id', id)
         .single();
       if (progErr) {
@@ -50,6 +51,17 @@ export default function ProgramaDetalhe() {
         return;
       }
       setPrograma(progData as Programa);
+
+      if (user?.id && progData?.organization_id) {
+        const { data: orgMember } = await supabase
+          .from('organization_members')
+          .select('role')
+          .eq('organization_id', progData.organization_id)
+          .eq('user_id', user.id)
+          .single();
+        setIsAdmin(orgMember?.role === 'lidera_admin');
+      }
+
       const { data: modData, error: modErr } = await supabase
         .from('modulos')
         .select('id, titulo, ordem, emoji')
@@ -113,7 +125,7 @@ export default function ProgramaDetalhe() {
             Atualizado em {new Date(programa.updated_at).toLocaleDateString('pt-BR')}
           </p>
         </div>
-        {user && (
+        {isAdmin && (
           <div className="detalhe-actions">
             <Link to={`/programas/${id}/editar`} className="btn btn--secondary">
               Editar programa
