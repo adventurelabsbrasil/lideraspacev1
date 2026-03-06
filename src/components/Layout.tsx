@@ -101,10 +101,10 @@ export default function Layout() {
             type="button"
             className="theme-toggle theme-toggle--mobile"
             onClick={toggleTheme}
-            title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-            aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            title={`Tema atual: ${theme}`}
+            aria-label="Alternar tema"
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'original' ? '✨' : theme === 'dark' ? '🌙' : '☀️'}
           </button>
         </div>
       </header>
@@ -133,10 +133,10 @@ export default function Layout() {
             type="button"
             className="theme-toggle theme-toggle--sidebar"
             onClick={toggleTheme}
-            title={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
-            aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+            title={`Tema atual: ${theme}`}
+            aria-label="Alternar tema"
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'original' ? '✨' : theme === 'dark' ? '🌙' : '☀️'}
           </button>
         </div>
         <nav className="sidebar-nav">

@@ -1,5 +1,4 @@
-/* Light theme (default) — minimalista estilo Notion */
-:root,
+/* Light theme (minimalista estilo Notion) */
 [data-theme="light"] {
   --bg-page: #fafafa;
   --bg-card: #ffffff;
@@ -20,9 +19,61 @@
   --error-text: #b91c1c;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* Dark theme (escala de cinza escuro neutro) */
+[data-theme="dark"] {
+  --bg-page: #191919;
+  --bg-card: #252525;
+  --bg-sidebar: #252525;
+  --input-bg: #2f2f2f;
+  --text-primary: #ebebeb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --border: #373737;
+  --border-subtle: #2f2f2f;
+  --hover-bg: #373737;
+  --primary: #d1d5db; /* Lighter gray for primary actions to keep it neutral */
+  --primary-text: #191919;
+  --primary-alpha: rgba(255, 255, 255, 0.1);
+  --focus-ring: #9ca3af;
+  --focus-ring-alpha: rgba(255, 255, 255, 0.15);
+  --error-bg: #450a0a;
+  --error-text: #fca5a5;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Original theme (Lidera Experience - Premium UI) */
+:root,
+[data-theme="original"] {
+  --bg-page: #0a1128;
+  --bg-page-gradient: radial-gradient(circle at top center, #13224a 0%, #0a1128 100%);
+  --bg-card: rgba(19, 34, 74, 0.4);
+  --bg-sidebar: rgba(10, 17, 40, 0.7);
+  --input-bg: rgba(255, 255, 255, 0.03);
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-muted: #9ca3af;
+  --border: rgba(212, 175, 55, 0.4); /* Thin golden borders */
+  --border-subtle: rgba(212, 175, 55, 0.15);
+  --hover-bg: rgba(212, 175, 55, 0.1);
+  --primary: #d4af37; /* Metallic Gold */
+  --primary-text: #0a1128; /* Deep navy text on gold */
+  --primary-alpha: rgba(212, 175, 55, 0.15);
+  --focus-ring: #d4af37;
+  --focus-ring-alpha: rgba(212, 175, 55, 0.25);
+  --error-bg: rgba(220, 38, 38, 0.15);
+  --error-text: #fca5a5;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(212, 175, 55, 0.05);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3), inset 0 0 5px rgba(212, 175, 55, 0.05);
+}
+
+/* Base definitions */
+:root {
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 10px;
+  --radius-lg: 12px;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -40,29 +91,8 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
-}
-
-/* Dark theme */
-[data-theme="dark"] {
-  --bg-page: #191919;
-  --bg-card: #252525;
-  --bg-sidebar: #252525;
-  --input-bg: #2f2f2f;
-  --text-primary: #ebebeb;
-  --text-secondary: #9ca3af;
-  --text-muted: #6b7280;
-  --border: #373737;
-  --border-subtle: #2f2f2f;
-  --hover-bg: #373737;
-  --primary: #4a9eff;
-  --primary-text: #ffffff;
-  --primary-alpha: rgba(74, 158, 255, 0.18);
-  --focus-ring: #4a9eff;
-  --focus-ring-alpha: rgba(74, 158, 255, 0.25);
-  --error-bg: #450a0a;
-  --error-text: #fca5a5;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --font-family-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-family-serif: "Playfair Display", Georgia, serif;
 }
 
 *,
@@ -72,7 +102,7 @@
 }
 
 html {
-  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-family-sans);
   line-height: 1.6;
   color: var(--text-primary);
   background: var(--bg-page);
@@ -83,8 +113,25 @@ body {
   min-height: 100vh;
 }
 
+[data-theme="original"] body {
+  background: var(--bg-page-gradient);
+  /* Textura de ruido sutil */
+  background-image: 
+    radial-gradient(circle at top center, rgba(19, 34, 74, 0.8) 0%, rgba(10, 17, 40, 1) 100%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-blend-mode: overlay;
+}
+
 #root {
   min-height: 100vh;
+}
+
+/* Tipografia */
+h1, h2, h3, h4, h5, h6, 
+.detalhe-title, .programa-novo-title {
+  font-family: var(--font-family-serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .auth-loading {

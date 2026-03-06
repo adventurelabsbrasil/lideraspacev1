@@ -9,7 +9,7 @@ import {
 
 const STORAGE_KEY = 'lideraspace-theme';
 
-type Theme = 'light' | 'dark';
+type Theme = 'light' | 'dark' | 'original';
 
 type ThemeContextValue = {
   theme: Theme;
@@ -19,10 +19,10 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') return 'light';
+  if (typeof window === 'undefined') return 'original';
   const stored = localStorage.getItem(STORAGE_KEY) as Theme | null;
-  if (stored === 'light' || stored === 'dark') return stored;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (stored === 'light' || stored === 'dark' || stored === 'original') return stored;
+  return 'original';
 }
 
 function applyTheme(theme: Theme) {
@@ -38,7 +38,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    setTheme((prev) => {
+      if (prev === 'original') return 'light';
+      if (prev === 'light') return 'dark';
+      return 'original';
+    });
   }, []);
 
   const value: ThemeContextValue = { theme, toggleTheme };
