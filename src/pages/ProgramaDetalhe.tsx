@@ -5,27 +5,27 @@ import { supabase } from '../lib/supabase';
 import './Detalhe.css';
 import './ProgramaDetalhe.css';
 
-type Programa = {
+type Program = {
   id: string;
-  titulo: string;
-  imagem_banner_url: string | null;
-  favicon_programa_url: string | null;
+  title: string;
+  banner_image_url: string | null;
+  program_favicon_url: string | null;
   created_at: string;
   updated_at: string;
 };
 
-type Modulo = {
+type Module = {
   id: string;
-  titulo: string;
-  ordem: number;
+  title: string;
+  sort_order: number;
   emoji: string | null;
 };
 
 export default function ProgramaDetalhe() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [programa, setPrograma] = useState<Programa | null>(null);
-  const [modulos, setModulos] = useState<Modulo[]>([]);
+  const [programa, setPrograma] = useState<Program | null>(null);
+  const [modulos, setModulos] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -39,8 +39,8 @@ export default function ProgramaDetalhe() {
       setLoading(true);
       setError(null);
       const { data: progData, error: progErr } = await supabase
-        .from('programas')
-        .select('id, organization_id, titulo, imagem_banner_url, favicon_programa_url, created_at, updated_at')
+        .from('programs')
+        .select('id, organization_id, title, banner_image_url, program_favicon_url, created_at, updated_at')
         .eq('id', id)
         .single();
       if (progErr) {
@@ -50,7 +50,7 @@ export default function ProgramaDetalhe() {
         setLoading(false);
         return;
       }
-      setPrograma(progData as Programa);
+      setPrograma(progData as Program);
 
       if (user?.id && progData?.organization_id) {
         const { data: orgMember } = await supabase
@@ -63,11 +63,11 @@ export default function ProgramaDetalhe() {
       }
 
       const { data: modData, error: modErr } = await supabase
-        .from('modulos')
-        .select('id, titulo, ordem, emoji')
-        .eq('programa_id', id)
-        .order('ordem', { ascending: true });
-      if (!modErr) setModulos((modData ?? []) as Modulo[]);
+        .from('modules')
+        .select('id, title, sort_order, emoji')
+        .eq('program_id', id)
+        .order('sort_order', { ascending: true });
+      if (!modErr) setModulos((modData ?? []) as Module[]);
       else setModulos([]);
       setLoading(false);
     }
@@ -107,12 +107,12 @@ export default function ProgramaDetalhe() {
         <span className="detalhe-breadcrumb-sep">/</span>
         <Link to="/programas">Programas</Link>
         <span className="detalhe-breadcrumb-sep">/</span>
-        <span>{programa.titulo}</span>
+        <span>{programa.title}</span>
       </nav>
-      {programa.imagem_banner_url && (
+      {programa.banner_image_url && (
         <div className="programa-detalhe-banner-wrap">
           <img
-            src={programa.imagem_banner_url}
+            src={programa.banner_image_url}
             alt=""
             className="programa-detalhe-banner"
           />
@@ -120,7 +120,7 @@ export default function ProgramaDetalhe() {
       )}
       <header className="detalhe-header">
         <div className="detalhe-header-main">
-          <h1 className="detalhe-title">{programa.titulo}</h1>
+          <h1 className="detalhe-title">{programa.title}</h1>
           <p className="detalhe-meta">
             Atualizado em {new Date(programa.updated_at).toLocaleDateString('pt-BR')}
           </p>
@@ -151,8 +151,8 @@ export default function ProgramaDetalhe() {
                   <span className="programa-detalhe-modulo-emoji">
                     {m.emoji && m.emoji.trim() ? m.emoji : '📄'}
                   </span>
-                  <span className="programa-detalhe-modulo-ordem">{m.ordem}</span>
-                  <span className="programa-detalhe-modulo-titulo">{m.titulo}</span>
+                  <span className="programa-detalhe-modulo-ordem">{m.sort_order}</span>
+                  <span className="programa-detalhe-modulo-titulo">{m.title}</span>
                 </Link>
               </li>
             ))}

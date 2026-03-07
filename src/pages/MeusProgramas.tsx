@@ -4,9 +4,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase, hasSupabaseConfig } from '../lib/supabase';
 import './MeusProgramas.css';
 
-type Programa = {
+type Program = {
   id: string;
-  titulo: string;
+  title: string;
   organization_id: string;
   created_at: string;
   updated_at: string;
@@ -14,7 +14,7 @@ type Programa = {
 
 export default function MeusProgramas() {
   const { user, loading: authLoading } = useAuth();
-  const [programas, setProgramas] = useState<Programa[]>([]);
+  const [programas, setProgramas] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,12 +33,12 @@ export default function MeusProgramas() {
       setLoading(true);
       setError(null);
       const { data, error: err } = await supabase
-        .from('programas')
-        .select('id, titulo, organization_id, created_at, updated_at')
+        .from('programs')
+        .select('id, title, organization_id, created_at, updated_at')
         .order('updated_at', { ascending: false });
       setLoading(false);
       if (import.meta.env.DEV) {
-        console.log('[MeusProgramas] Resposta:', err ? { error: err.message, code: err.code } : { total: (data ?? []).length, programas: data });
+        console.log('[MeusProgramas] Resposta:', err ? { error: err.message, code: err.code } : { total: (data ?? []).length, programs: data });
       }
       if (err) {
         console.error('[MeusProgramas] Supabase error:', err);
@@ -71,7 +71,7 @@ export default function MeusProgramas() {
           {programas.map((p) => (
             <li key={p.id}>
               <Link to={`/programas/${p.id}`} className="meus-programas-card">
-                <span className="meus-programas-card-titulo">{p.titulo}</span>
+                <span className="meus-programas-card-titulo">{p.title}</span>
                 <span className="meus-programas-card-meta">
                   Atualizado em {new Date(p.updated_at).toLocaleDateString('pt-BR')}
                 </span>

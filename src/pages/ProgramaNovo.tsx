@@ -16,11 +16,11 @@ export default function ProgramaNovo() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [titulo, setTitulo] = useState('');
+  const [title, setTitle] = useState('');
   const [organizationId, setOrganizationId] = useState('');
-  const [imagemBannerUrl, setImagemBannerUrl] = useState('');
-  const [faviconProgramaUrl, setFaviconProgramaUrl] = useState('');
-  const [faviconCriadorUrl, setFaviconCriadorUrl] = useState('');
+  const [bannerImageUrl, setBannerImageUrl] = useState('');
+  const [programFaviconUrl, setProgramFaviconUrl] = useState('');
+  const [creatorFaviconUrl, setCreatorFaviconUrl] = useState('');
 
   useEffect(() => {
     async function loadOrganizations() {
@@ -55,7 +55,7 @@ export default function ProgramaNovo() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!user?.id) return;
-    if (!titulo.trim()) {
+    if (!title.trim()) {
       setError('Informe o título do programa.');
       return;
     }
@@ -66,14 +66,14 @@ export default function ProgramaNovo() {
     setError(null);
     setSubmitting(true);
     const { data, error: err } = await supabase
-      .from('programas')
+      .from('programs')
       .insert({
         organization_id: organizationId,
-        titulo: titulo.trim(),
+        title: title.trim(),
         created_by: user.id,
-        imagem_banner_url: imagemBannerUrl.trim() || null,
-        favicon_programa_url: faviconProgramaUrl.trim() || null,
-        favicon_criador_url: faviconCriadorUrl.trim() || null,
+        banner_image_url: bannerImageUrl.trim() || null,
+        program_favicon_url: programFaviconUrl.trim() || null,
+        creator_favicon_url: creatorFaviconUrl.trim() || null,
       })
       .select('id')
       .single();
@@ -112,8 +112,8 @@ export default function ProgramaNovo() {
             <input
               id="titulo"
               type="text"
-              value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Ex: Liderança em Ação"
               required
               autoFocus
@@ -135,22 +135,22 @@ export default function ProgramaNovo() {
           </div>
           <ImageUrlOrUpload
             label="URL da imagem banner"
-            value={imagemBannerUrl}
-            onChange={setImagemBannerUrl}
+            value={bannerImageUrl}
+            onChange={setBannerImageUrl}
             placeholder="https://... ou salve o programa e use Enviar arquivo"
             variant="banner"
           />
           <ImageUrlOrUpload
             label="URL do favicon do programa"
-            value={faviconProgramaUrl}
-            onChange={setFaviconProgramaUrl}
+            value={programFaviconUrl}
+            onChange={setProgramFaviconUrl}
             placeholder="https://..."
             variant="favicon"
           />
           <ImageUrlOrUpload
             label="URL do favicon do criador"
-            value={faviconCriadorUrl}
-            onChange={setFaviconCriadorUrl}
+            value={creatorFaviconUrl}
+            onChange={setCreatorFaviconUrl}
             placeholder="https://..."
             variant="favicon"
           />

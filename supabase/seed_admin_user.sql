@@ -17,6 +17,6 @@ INSERT INTO public.organization_members (organization_id, user_id, role)
 VALUES (
   'a0000001-0000-4000-8000-000000000001'::uuid,
   'e9a67154-cefd-4730-ab12-4ce6eac14e8d'::uuid,
-  'admin'
+  'lidera_admin'
 )
-ON CONFLICT (organization_id, user_id) DO UPDATE SET role = 'admin';
+ON CONFLICT (organization_id, user_id) DO UPDATE SET role = 'lidera_admin';

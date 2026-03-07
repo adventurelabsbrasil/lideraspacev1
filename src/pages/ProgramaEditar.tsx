@@ -15,10 +15,10 @@ export default function ProgramaEditar() {
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
-  const [titulo, setTitulo] = useState('');
-  const [imagemBannerUrl, setImagemBannerUrl] = useState('');
-  const [faviconProgramaUrl, setFaviconProgramaUrl] = useState('');
-  const [faviconCriadorUrl, setFaviconCriadorUrl] = useState('');
+  const [title, setTitle] = useState('');
+  const [bannerImageUrl, setBannerImageUrl] = useState('');
+  const [programFaviconUrl, setProgramFaviconUrl] = useState('');
+  const [creatorFaviconUrl, setCreatorFaviconUrl] = useState('');
 
   useEffect(() => {
     if (!id) {
@@ -29,8 +29,8 @@ export default function ProgramaEditar() {
       setLoading(true);
       setError(null);
       const { data, error: err } = await supabase
-        .from('programas')
-        .select('id, organization_id, titulo, imagem_banner_url, favicon_programa_url, favicon_criador_url')
+        .from('programs')
+        .select('id, organization_id, title, banner_image_url, program_favicon_url, creator_favicon_url')
         .eq('id', id)
         .single();
       
@@ -39,11 +39,11 @@ export default function ProgramaEditar() {
         setLoading(false);
         return;
       }
-      const row = data as { organization_id: string; titulo: string; imagem_banner_url?: string | null; favicon_programa_url?: string | null; favicon_criador_url?: string | null };
-      setTitulo(row.titulo ?? '');
-      setImagemBannerUrl(row.imagem_banner_url ?? '');
-      setFaviconProgramaUrl(row.favicon_programa_url ?? '');
-      setFaviconCriadorUrl(row.favicon_criador_url ?? '');
+      const row = data as { organization_id: string; title: string; banner_image_url?: string | null; program_favicon_url?: string | null; creator_favicon_url?: string | null };
+      setTitle(row.title ?? '');
+      setBannerImageUrl(row.banner_image_url ?? '');
+      setProgramFaviconUrl(row.program_favicon_url ?? '');
+      setCreatorFaviconUrl(row.creator_favicon_url ?? '');
 
       if (user?.id && row.organization_id) {
         const { data: orgMember } = await supabase
@@ -64,19 +64,19 @@ export default function ProgramaEditar() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!user?.id || !id) return;
-    if (!titulo.trim()) {
+    if (!title.trim()) {
       setError('Informe o título do programa.');
       return;
     }
     setError(null);
     setSubmitting(true);
     const { error: err } = await supabase
-      .from('programas')
+      .from('programs')
       .update({
-        titulo: titulo.trim(),
-        imagem_banner_url: imagemBannerUrl.trim() || null,
-        favicon_programa_url: faviconProgramaUrl.trim() || null,
-        favicon_criador_url: faviconCriadorUrl.trim() || null,
+        title: title.trim(),
+        banner_image_url: bannerImageUrl.trim() || null,
+        program_favicon_url: programFaviconUrl.trim() || null,
+        creator_favicon_url: creatorFaviconUrl.trim() || null,
       })
       .eq('id', id);
     setSubmitting(false);
@@ -134,8 +134,8 @@ export default function ProgramaEditar() {
           <input
             id="titulo"
             type="text"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             placeholder="Ex: Liderança em Ação"
             required
             autoFocus
@@ -143,24 +143,24 @@ export default function ProgramaEditar() {
         </div>
         <ImageUrlOrUpload
           label="URL da imagem banner"
-          value={imagemBannerUrl}
-          onChange={setImagemBannerUrl}
+          value={bannerImageUrl}
+          onChange={setBannerImageUrl}
           placeholder="https://..."
           variant="banner"
           uploadContext={id ? { pathPrefix: 'banners', contextId: id } : undefined}
         />
         <ImageUrlOrUpload
           label="URL do favicon do programa"
-          value={faviconProgramaUrl}
-          onChange={setFaviconProgramaUrl}
+          value={programFaviconUrl}
+          onChange={setProgramFaviconUrl}
           placeholder="https://..."
           variant="favicon"
           uploadContext={id ? { pathPrefix: 'favicons/programa', contextId: id } : undefined}
         />
         <ImageUrlOrUpload
           label="URL do favicon do criador"
-          value={faviconCriadorUrl}
-          onChange={setFaviconCriadorUrl}
+          value={creatorFaviconUrl}
+          onChange={setCreatorFaviconUrl}
           placeholder="https://..."
           variant="favicon"
           uploadContext={id ? { pathPrefix: 'favicons/criador', contextId: id } : undefined}

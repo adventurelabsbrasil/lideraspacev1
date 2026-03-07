@@ -8,32 +8,32 @@ import './ModuloDetalhe.css';
 
 type Material = { url?: string; label?: string; icon?: string };
 
-type Modulo = {
+type Module = {
   id: string;
-  titulo: string;
-  ordem: number;
+  title: string;
+  sort_order: number;
   emoji: string | null;
-  descricao: string | null;
-  blocos: Block[];
-  topicos: string[];
-  subtopicos: string[];
+  description: string | null;
+  blocks: Block[];
+  topics: string[];
+  subtopics: string[];
   video_youtube_embed_url: string | null;
-  materiais: Material[] | null;
-  imagem_banner_url: string | null;
-  programa_id: string;
+  materials: Material[] | null;
+  banner_image_url: string | null;
+  program_id: string;
 };
 
 export default function ModuloDetalhe() {
   const { programaId, moduloId } = useParams<{ programaId: string; moduloId: string }>();
   const { user } = useAuth();
-  const [modulo, setModulo] = useState<Modulo | null>(null);
-  const [childModulos, setChildModulos] = useState<{ id: string; titulo: string; emoji: string | null }[]>([]);
+  const [modulo, setModulo] = useState<Module | null>(null);
+  const [childModulos, setChildModulos] = useState<{ id: string; title: string; emoji: string | null }[]>([]);
   const [programaTitulo, setProgramaTitulo] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   
-  const [studentState, setStudentState] = useState<{ anotacoes: string; checklist: Record<string, boolean> }>({ anotacoes: '', checklist: {} });
+  const [studentState, setStudentState] = useState<{ notes: string; checklist: Record<string, boolean> }>({ notes: '', checklist: {} });
 
   useEffect(() => {
     if (!moduloId || !programaId) {
@@ -44,10 +44,10 @@ export default function ModuloDetalhe() {
       setLoading(true);
       setError(null);
       const { data: modData, error: modErr } = await supabase
-        .from('modulos')
-        .select('id, titulo, ordem, emoji, descricao, blocos, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, programa_id')
+        .from('modules')
+        .select('id, title, sort_order, emoji, description, blocks, topics, subtopics, video_youtube_embed_url, materials, banner_image_url, program_id')
         .eq('id', moduloId)
-        .eq('programa_id', programaId)
+        .eq('program_id', programaId)
         .single();
       
       if (modErr || !modData) {
@@ -59,21 +59,21 @@ export default function ModuloDetalhe() {
       const m = modData as any;
       setModulo({
         ...m,
-        descricao: m.descricao ?? null,
-        blocos: Array.isArray(m.blocos) ? m.blocos : [],
-        topicos: Array.isArray(m.topicos) ? m.topicos : [],
-        subtopicos: Array.isArray(m.subtopicos) ? m.subtopicos : [],
-        materiais: Array.isArray(m.materiais) ? m.materiais : [],
+        description: m.description ?? null,
+        blocks: Array.isArray(m.blocks) ? m.blocks : [],
+        topics: Array.isArray(m.topics) ? m.topics : [],
+        subtopics: Array.isArray(m.subtopics) ? m.subtopics : [],
+        materials: Array.isArray(m.materials) ? m.materials : [],
       });
       
       const { data: progData } = await supabase
-        .from('programas')
-        .select('titulo, organization_id')
+        .from('programs')
+        .select('title, organization_id')
         .eq('id', programaId)
         .single();
       
-      const prog = progData as { titulo?: string; organization_id?: string } | null;
-      setProgramaTitulo(prog?.titulo ?? 'Programa');
+      const prog = progData as { title?: string; organization_id?: string } | null;
+      setProgramaTitulo(prog?.title ?? 'Programa');
 
       if (user?.id) {
         if (prog?.organization_id) {
@@ -87,23 +87,23 @@ export default function ModuloDetalhe() {
         }
         
         const { data: stateData } = await supabase
-          .from('aluno_modulo_state')
-          .select('anotacoes, checklist')
+          .from('student_module_states')
+          .select('notes, checklist')
           .eq('user_id', user.id)
-          .eq('modulo_id', moduloId)
+          .eq('module_id', moduloId)
           .single();
           
         if (stateData) {
-          setStudentState({ anotacoes: stateData.anotacoes || '', checklist: stateData.checklist || {} });
+          setStudentState({ notes: stateData.notes || '', checklist: stateData.checklist || {} });
         }
       }
 
       // Load children modulos (subpages)
       const { data: childrenData } = await supabase
-        .from('modulos')
-        .select('id, titulo, emoji')
+        .from('modules')
+        .select('id, title, emoji')
         .eq('parent_id', moduloId)
-        .order('ordem', { ascending: true });
+        .order('sort_order', { ascending: true });
         
       setChildModulos(childrenData || []);
 
@@ -117,20 +117,20 @@ export default function ModuloDetalhe() {
     const newChecklist = { ...studentState.checklist, [taskId]: checked };
     setStudentState(prev => ({ ...prev, checklist: newChecklist }));
     
-    await supabase.from('aluno_modulo_state').upsert({
+    await supabase.from('student_module_states').upsert({
       user_id: user.id,
-      modulo_id: moduloId,
+      module_id: moduloId,
       checklist: newChecklist
     });
   };
 
-  const saveAnotacoes = async (texto: string) => {
+  const saveNotes = async (texto: string) => {
     if (!user?.id || !moduloId) return;
-    setStudentState(prev => ({ ...prev, anotacoes: texto }));
-    await supabase.from('aluno_modulo_state').upsert({
+    setStudentState(prev => ({ ...prev, notes: texto }));
+    await supabase.from('student_module_states').upsert({
       user_id: user.id,
-      modulo_id: moduloId,
-      anotacoes: texto
+      module_id: moduloId,
+      notes: texto
     });
   };
 
@@ -160,7 +160,7 @@ export default function ModuloDetalhe() {
     );
   }
 
-  const materiais = modulo.materiais ?? [];
+  const materiais = modulo.materials ?? [];
 
   return (
     <div className="page-content detalhe-page modulo-detalhe-page">
@@ -171,12 +171,12 @@ export default function ModuloDetalhe() {
         <span className="detalhe-breadcrumb-sep">/</span>
         <Link to={`/programas/${programaId}`}>{programaTitulo}</Link>
         <span className="detalhe-breadcrumb-sep">/</span>
-        <span>{modulo.titulo}</span>
+        <span>{modulo.title}</span>
       </nav>
-      {modulo.imagem_banner_url && (
+      {modulo.banner_image_url && (
         <div className="modulo-detalhe-banner-wrap">
           <img
-            src={modulo.imagem_banner_url}
+            src={modulo.banner_image_url}
             alt=""
             className="modulo-detalhe-banner"
           />
@@ -187,9 +187,9 @@ export default function ModuloDetalhe() {
           {modulo.emoji && modulo.emoji.trim() && (
             <span className="modulo-detalhe-title-emoji" aria-hidden>{modulo.emoji}</span>
           )}
-          <h1 className="detalhe-title">{modulo.titulo}</h1>
-          {modulo.descricao && (
-            <p className="detalhe-meta" style={{ marginTop: 'var(--space-2)' }}>{modulo.descricao}</p>
+          <h1 className="detalhe-title">{modulo.title}</h1>
+          {modulo.description && (
+            <p className="detalhe-meta" style={{ marginTop: 'var(--space-2)' }}>{modulo.description}</p>
           )}
         </div>
         {isAdmin && (
@@ -217,9 +217,9 @@ export default function ModuloDetalhe() {
       )}
 
       {/* Blocos Dinâmicos */}
-      {modulo.blocos && modulo.blocos.length > 0 && (
+      {modulo.blocks && modulo.blocks.length > 0 && (
         <section className="detalhe-section modulo-blocos-section">
-          {modulo.blocos.map((bloco) => {
+          {modulo.blocks.map((bloco) => {
             switch (bloco.type) {
               case 'heading':
                 return <h2 key={bloco.id} className="bloco-heading">{bloco.content}</h2>;
@@ -270,7 +270,7 @@ export default function ModuloDetalhe() {
             {childModulos.map(child => (
               <Link key={child.id} to={`/programas/${programaId}/modulos/${child.id}`} className="card card--hover modulo-subpage-card">
                 <span className="modulo-subpage-emoji">{child.emoji || '📄'}</span>
-                <span>{child.titulo}</span>
+                <span>{child.title}</span>
               </Link>
             ))}
           </div>
@@ -311,9 +311,9 @@ export default function ModuloDetalhe() {
           <textarea 
             className="input-textarea"
             placeholder="Faça suas anotações aqui. Elas são salvas automaticamente."
-            value={studentState.anotacoes}
-            onChange={(e) => setStudentState(prev => ({ ...prev, anotacoes: e.target.value }))}
-            onBlur={(e) => saveAnotacoes(e.target.value)}
+            value={studentState.notes}
+            onChange={(e) => setStudentState(prev => ({ ...prev, notes: e.target.value }))}
+            onBlur={(e) => saveNotes(e.target.value)}
             style={{ minHeight: '150px' }}
           />
         </section>

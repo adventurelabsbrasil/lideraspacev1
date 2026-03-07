@@ -9,7 +9,7 @@ export default function Perfil() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const [nomeCompleto, setNomeCompleto] = useState('');
+  const [fullName, setFullName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
@@ -19,12 +19,12 @@ export default function Perfil() {
       setLoading(true);
       const { data, error } = await supabase
         .from('profiles')
-        .select('nome_completo, avatar_url')
+        .select('full_name, avatar_url')
         .eq('id', user!.id)
         .single();
       
       if (!error && data) {
-        setNomeCompleto(data.nome_completo || '');
+        setFullName(data.full_name || '');
         setAvatarUrl(data.avatar_url || '');
       }
       setLoading(false);
@@ -43,7 +43,7 @@ export default function Perfil() {
       .from('profiles')
       .upsert({
         id: user.id,
-        nome_completo: nomeCompleto.trim(),
+        full_name: fullName.trim(),
         avatar_url: avatarUrl.trim() || null,
         updated_at: new Date().toISOString()
       });
@@ -111,7 +111,7 @@ export default function Perfil() {
             <img src={avatarUrl} alt="Avatar" className="perfil-avatar-preview" />
           ) : (
             <div className="perfil-avatar-placeholder">
-              {(nomeCompleto || user?.email || '?').charAt(0).toUpperCase()}
+              {(fullName || user?.email || '?').charAt(0).toUpperCase()}
             </div>
           )}
           
@@ -145,8 +145,8 @@ export default function Perfil() {
           <input 
             id="nomeCompleto" 
             type="text" 
-            value={nomeCompleto} 
-            onChange={e => setNomeCompleto(e.target.value)} 
+            value={fullName} 
+            onChange={e => setFullName(e.target.value)} 
             placeholder="Ex: João da Silva"
           />
         </div>

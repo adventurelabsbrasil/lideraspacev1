@@ -32,20 +32,20 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [availableParents, setAvailableParents] = useState<{ id: string; titulo: string }[]>([]);
+  const [availableParents, setAvailableParents] = useState<{ id: string; title: string }[]>([]);
 
-  const [titulo, setTitulo] = useState('');
+  const [title, setTitle] = useState('');
   const [emoji, setEmoji] = useState('');
-  const [ordem, setOrdem] = useState(0);
+  const [sortOrder, setSortOrder] = useState(0);
   const [parentId, setParentId] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [blocos, setBlocos] = useState<Block[]>([]);
-  const [topicos, setTopicos] = useState<string[]>([]);
-  const [subtopicos, setSubtopicos] = useState<string[]>([]);
+  const [description, setDescription] = useState('');
+  const [blocks, setBlocks] = useState<Block[]>([]);
+  const [topics, setTopics] = useState<string[]>([]);
+  const [subtopics, setSubtopics] = useState<string[]>([]);
   const [videoYoutubeUrl, setVideoYoutubeUrl] = useState('');
-  const [materiais, setMateriais] = useState<MaterialItem[]>([]);
-  const [imagemBannerUrl, setImagemBannerUrl] = useState('');
-  const [faviconProgramaUrl, setFaviconProgramaUrl] = useState('');
+  const [materials, setMaterials] = useState<MaterialItem[]>([]);
+  const [bannerImageUrl, setBannerImageUrl] = useState('');
+  const [programFaviconUrl, setProgramFaviconUrl] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -53,7 +53,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       setError(null);
       
       const { data: progData } = await supabase
-        .from('programas')
+        .from('programs')
         .select('organization_id')
         .eq('id', programaId)
         .single();
@@ -70,7 +70,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
         setIsAdmin(false);
       }
 
-      let query = supabase.from('modulos').select('id, titulo').eq('programa_id', programaId);
+      let query = supabase.from('modules').select('id, title').eq('program_id', programaId);
       if (moduloId) {
         query = query.neq('id', moduloId);
       }
@@ -79,10 +79,10 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
 
       if (isEdit && moduloId) {
         const { data, error: err } = await supabase
-          .from('modulos')
-          .select('titulo, ordem, emoji, parent_id, descricao, blocos, topicos, subtopicos, video_youtube_embed_url, materiais, imagem_banner_url, favicon_programa_url')
+          .from('modules')
+          .select('title, sort_order, emoji, parent_id, description, blocks, topics, subtopics, video_youtube_embed_url, materials, banner_image_url, program_favicon_url')
           .eq('id', moduloId)
-          .eq('programa_id', programaId)
+          .eq('program_id', programaId)
           .single();
         if (err || !data) {
           setError(err?.message ?? 'Módulo não encontrado.');
@@ -90,50 +90,50 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
           return;
         }
         const row = data as any;
-        setTitulo(row.titulo ?? '');
+        setTitle(row.title ?? '');
         setEmoji(row.emoji ?? '');
-        setOrdem(row.ordem ?? 0);
+        setSortOrder(row.sort_order ?? 0);
         setParentId(row.parent_id ?? '');
-        setDescricao(row.descricao ?? '');
-        setBlocos(Array.isArray(row.blocos) ? row.blocos : []);
-        setTopicos(Array.isArray(row.topicos) ? row.topicos : []);
-        setSubtopicos(Array.isArray(row.subtopicos) ? row.subtopicos : []);
+        setDescription(row.description ?? '');
+        setBlocks(Array.isArray(row.blocks) ? row.blocks : []);
+        setTopics(Array.isArray(row.topics) ? row.topics : []);
+        setSubtopics(Array.isArray(row.subtopics) ? row.subtopics : []);
         setVideoYoutubeUrl(row.video_youtube_embed_url ?? '');
-        setMateriais(Array.isArray(row.materiais) ? row.materiais : []);
-        setImagemBannerUrl(row.imagem_banner_url ?? '');
-        setFaviconProgramaUrl(row.favicon_programa_url ?? '');
+        setMaterials(Array.isArray(row.materials) ? row.materials : []);
+        setBannerImageUrl(row.banner_image_url ?? '');
+        setProgramFaviconUrl(row.program_favicon_url ?? '');
       }
       setLoading(false);
     }
     load();
   }, [programaId, moduloId, isEdit, user?.id]);
 
-  function addTopico() { setTopicos((prev) => [...prev, '']); }
-  function setTopicoAt(i: number, v: string) {
-    setTopicos((prev) => { const next = [...prev]; next[i] = v; return next; });
+  function addTopic() { setTopics((prev) => [...prev, '']); }
+  function setTopicAt(i: number, v: string) {
+    setTopics((prev) => { const next = [...prev]; next[i] = v; return next; });
   }
-  function removeTopico(i: number) { setTopicos((prev) => prev.filter((_, j) => j !== i)); }
+  function removeTopic(i: number) { setTopics((prev) => prev.filter((_, j) => j !== i)); }
 
-  function addSubtopicos() { setSubtopicos((prev) => [...prev, '']); }
+  function addSubtopics() { setSubtopics((prev) => [...prev, '']); }
   function setSubtopicAt(i: number, v: string) {
-    setSubtopicos((prev) => { const next = [...prev]; next[i] = v; return next; });
+    setSubtopics((prev) => { const next = [...prev]; next[i] = v; return next; });
   }
-  function removeSubtopic(i: number) { setSubtopicos((prev) => prev.filter((_, j) => j !== i)); }
+  function removeSubtopic(i: number) { setSubtopics((prev) => prev.filter((_, j) => j !== i)); }
 
-  function addMaterial() { setMateriais((prev) => [...prev, { url: '', label: '', icon: 'link' }]); }
+  function addMaterial() { setMaterials((prev) => [...prev, { url: '', label: '', icon: 'link' }]); }
   function setMaterialAt(i: number, field: keyof MaterialItem, value: string) {
-    setMateriais((prev) => { const next = [...prev]; next[i] = { ...next[i], [field]: value }; return next; });
+    setMaterials((prev) => { const next = [...prev]; next[i] = { ...next[i], [field]: value }; return next; });
   }
-  function removeMaterial(i: number) { setMateriais((prev) => prev.filter((_, j) => j !== i)); }
+  function removeMaterial(i: number) { setMaterials((prev) => prev.filter((_, j) => j !== i)); }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!titulo.trim()) {
+    if (!title.trim()) {
       setError('Informe o título da página.');
       return;
     }
     const embedUrl = videoYoutubeUrl.trim() ? youtubeToEmbedUrl(videoYoutubeUrl) : null;
-    const materiaisClean = materiais
+    const materialsClean = materials
       .filter((m) => (m.url || '').trim())
       .map((m) => ({ url: m.url.trim(), label: (m.label || '').trim() || m.url.trim(), icon: (m.icon || 'link').trim() }));
 
@@ -141,26 +141,26 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
     setSubmitting(true);
 
     const payload = {
-      titulo: titulo.trim(),
-      ordem: Number(ordem) || 0,
+      title: title.trim(),
+      sort_order: Number(sortOrder) || 0,
       emoji: emoji.trim() || null,
       parent_id: parentId || null,
-      descricao: descricao.trim() || null,
-      blocos: blocos,
-      topicos: topicos.filter((t) => t.trim()).map((t) => t.trim()),
-      subtopicos: subtopicos.filter((s) => s.trim()).map((s) => s.trim()),
+      description: description.trim() || null,
+      blocks: blocks,
+      topics: topics.filter((t) => t.trim()).map((t) => t.trim()),
+      subtopics: subtopics.filter((s) => s.trim()).map((s) => s.trim()),
       video_youtube_embed_url: embedUrl,
-      materiais: materiaisClean,
-      imagem_banner_url: imagemBannerUrl.trim() || null,
-      favicon_programa_url: faviconProgramaUrl.trim() || null,
+      materials: materialsClean,
+      banner_image_url: bannerImageUrl.trim() || null,
+      program_favicon_url: programFaviconUrl.trim() || null,
     };
 
     if (isEdit && moduloId) {
       const { error: err } = await supabase
-        .from('modulos')
+        .from('modules')
         .update(payload)
         .eq('id', moduloId)
-        .eq('programa_id', programaId);
+        .eq('program_id', programaId);
       setSubmitting(false);
       if (err) {
         setError(err.message ?? 'Erro ao salvar.');
@@ -169,8 +169,8 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       navigate(`/programas/${programaId}/modulos/${moduloId}`);
     } else {
       const { data, error: err } = await supabase
-        .from('modulos')
-        .insert({ ...payload, programa_id: programaId })
+        .from('modules')
+        .insert({ ...payload, program_id: programaId })
         .select('id')
         .single();
       setSubmitting(false);
@@ -224,8 +224,8 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
           <input
             id="modulo-titulo"
             type="text"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             placeholder="Ex: Introdução ao Lidera"
             required
           />
@@ -254,7 +254,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
           >
             <option value="">-- Nenhuma (Raiz) --</option>
             {availableParents.map(p => (
-              <option key={p.id} value={p.id}>{p.titulo}</option>
+              <option key={p.id} value={p.id}>{p.title}</option>
             ))}
           </select>
         </div>
@@ -265,8 +265,8 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             id="modulo-ordem"
             type="number"
             min={0}
-            value={ordem}
-            onChange={(e) => setOrdem(Number(e.target.value) || 0)}
+            value={sortOrder}
+            onChange={(e) => setSortOrder(Number(e.target.value) || 0)}
           />
         </div>
 
@@ -275,8 +275,8 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
           <textarea
             className="input-textarea"
             placeholder="Um breve resumo sobre o conteúdo desta página..."
-            value={descricao}
-            onChange={(e) => setDescricao(e.target.value)}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             rows={3}
           />
         </div>
@@ -293,7 +293,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
 
         <div className="programa-novo-field modulo-form-rich-field" style={{ marginTop: 'var(--space-4)' }}>
           <label>Área de Conteúdo Livre (Blocos Dinâmicos)</label>
-          <BlockEditor blocks={blocos} onChange={setBlocos} />
+          <BlockEditor blocks={blocks} onChange={setBlocks} />
         </div>
 
         <div className="modulo-form-group">
@@ -303,7 +303,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
               + Adicionar
             </button>
           </div>
-          {materiais.map((m, i) => (
+          {materials.map((m, i) => (
             <div key={i} className="modulo-form-material-row">
               <input
                 type="url"
@@ -336,8 +336,8 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
 
         <ImageUrlOrUpload
           label="URL da imagem banner da página"
-          value={imagemBannerUrl}
-          onChange={setImagemBannerUrl}
+          value={bannerImageUrl}
+          onChange={setBannerImageUrl}
           placeholder="https://..."
           variant="banner"
           uploadContext={moduloId ? { pathPrefix: 'modulos/banner', contextId: moduloId } : undefined}
@@ -349,20 +349,20 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
             <div style={{ marginTop: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
               <div className="modulo-form-group-header">
                 <label>Tópicos</label>
-                <button type="button" className="modulo-form-add-btn" onClick={addTopico}>+ Adicionar</button>
+                <button type="button" className="modulo-form-add-btn" onClick={addTopic}>+ Adicionar</button>
               </div>
-              {topicos.map((t, i) => (
+              {topics.map((t, i) => (
                 <div key={i} className="modulo-form-row">
-                  <input type="text" value={t} onChange={(e) => setTopicoAt(i, e.target.value)} placeholder="Tópico" />
-                  <button type="button" className="modulo-form-remove-btn" onClick={() => removeTopico(i)}>×</button>
+                  <input type="text" value={t} onChange={(e) => setTopicAt(i, e.target.value)} placeholder="Tópico" />
+                  <button type="button" className="modulo-form-remove-btn" onClick={() => removeTopic(i)}>×</button>
                 </div>
               ))}
 
               <div className="modulo-form-group-header">
                 <label>Subtópicos</label>
-                <button type="button" className="modulo-form-add-btn" onClick={addSubtopicos}>+ Adicionar</button>
+                <button type="button" className="modulo-form-add-btn" onClick={addSubtopics}>+ Adicionar</button>
               </div>
-              {subtopicos.map((s, i) => (
+              {subtopics.map((s, i) => (
                 <div key={i} className="modulo-form-row">
                   <input type="text" value={s} onChange={(e) => setSubtopicAt(i, e.target.value)} placeholder="Subtópico" />
                   <button type="button" className="modulo-form-remove-btn" onClick={() => removeSubtopic(i)}>×</button>

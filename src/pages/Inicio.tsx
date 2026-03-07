@@ -4,23 +4,23 @@ import './Inicio.css';
 
 // Dados mock para a parte visual (serão substituídos por Supabase depois)
 const programasMock = [
-  { id: '1', nome: 'Liderança em Ação', progresso: 65, totalTarefas: 12, concluidas: 8 },
-  { id: '2', nome: 'Gestão de Equipes', progresso: 30, totalTarefas: 10, concluidas: 3 },
-  { id: '3', nome: 'Comunicação Eficaz', progresso: 0, totalTarefas: 8, concluidas: 0 },
+  { id: '1', title: 'Liderança em Ação', progresso: 65, totalTarefas: 12, concluidas: 8 },
+  { id: '2', title: 'Gestão de Equipes', progresso: 30, totalTarefas: 10, concluidas: 3 },
+  { id: '3', title: 'Comunicação Eficaz', progresso: 0, totalTarefas: 8, concluidas: 0 },
 ];
 
 const tarefasResumoMock = [
-  { id: '1', titulo: 'Módulo 1 - Introdução', programa: 'Liderança em Ação', status: 'Concluída', prazo: '15/02' },
-  { id: '2', titulo: 'Feedback 360°', programa: 'Liderança em Ação', status: 'Em andamento', prazo: '28/03' },
-  { id: '3', titulo: 'Planejamento de reuniões', programa: 'Gestão de Equipes', status: 'Pendente', prazo: '05/04' },
-  { id: '4', titulo: 'Escuta ativa', programa: 'Comunicação Eficaz', status: 'Pendente', prazo: '12/04' },
+  { id: '1', title: 'Módulo 1 - Introdução', programa: 'Liderança em Ação', status: 'Concluída', prazo: '15/02' },
+  { id: '2', title: 'Feedback 360°', programa: 'Liderança em Ação', status: 'Em andamento', prazo: '28/03' },
+  { id: '3', title: 'Planejamento de reuniões', programa: 'Gestão de Equipes', status: 'Pendente', prazo: '05/04' },
+  { id: '4', title: 'Escuta ativa', programa: 'Comunicação Eficaz', status: 'Pendente', prazo: '12/04' },
 ];
 
 const ativosRecentesMock = [
-  { id: '1', tipo: 'Tarefa concluída', titulo: 'Módulo 1 - Introdução', quando: 'Hoje, 14:32' },
-  { id: '2', tipo: 'Novo programa', titulo: 'Comunicação Eficaz', quando: 'Ontem' },
-  { id: '3', tipo: 'Progresso', titulo: 'Feedback 360° — 60%', quando: '28/02' },
-  { id: '4', tipo: 'Tarefa concluída', titulo: 'Dinâmica de equipe', quando: '27/02' },
+  { id: '1', tipo: 'Tarefa concluída', title: 'Módulo 1 - Introdução', quando: 'Hoje, 14:32' },
+  { id: '2', tipo: 'Novo programa', title: 'Comunicação Eficaz', quando: 'Ontem' },
+  { id: '3', tipo: 'Progresso', title: 'Feedback 360° — 60%', quando: '28/02' },
+  { id: '4', tipo: 'Tarefa concluída', title: 'Dinâmica de equipe', quando: '27/02' },
 ];
 
 function getNomeCurto(email: string | undefined): string {
@@ -53,7 +53,7 @@ export default function Inicio() {
           {programasMock.map((p) => (
             <Link key={p.id} to={`/programas/${p.id}`} className="inicio-card">
               <div className="inicio-card-header">
-                <span className="inicio-card-nome">{p.nome}</span>
+                <span className="inicio-card-nome">{p.title}</span>
                 <span className="inicio-card-badge">{p.concluidas}/{p.totalTarefas}</span>
               </div>
               <div className="inicio-card-progress">
@@ -88,7 +88,7 @@ export default function Inicio() {
               {tarefasResumoMock.map((t) => (
                 <tr key={t.id}>
                   <td className="inicio-table-titulo">
-                    <Link to={`/tarefas/${t.id}`} className="inicio-table-link">{t.titulo}</Link>
+                    <Link to={`/tarefas/${t.id}`} className="inicio-table-link">{t.title}</Link>
                   </td>
                   <td>{t.programa}</td>
                   <td>
@@ -111,7 +111,7 @@ export default function Inicio() {
           {ativosRecentesMock.map((a) => (
             <Link key={a.id} to={`/ativos/${a.id}`} className="inicio-scorecard inicio-scorecard--link">
               <span className="inicio-scorecard-tipo">{a.tipo}</span>
-              <span className="inicio-scorecard-titulo">{a.titulo}</span>
+              <span className="inicio-scorecard-titulo">{a.title}</span>
               <span className="inicio-scorecard-quando">{a.quando}</span>
             </Link>
           ))}

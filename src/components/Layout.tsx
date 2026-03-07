@@ -5,8 +5,8 @@ import { useTheme } from '../contexts/ThemeContext';
 import { supabase, hasSupabaseConfig } from '../lib/supabase';
 import './Layout.css';
 
-type Programa = { id: string; titulo: string };
-type Modulo = { id: string; titulo: string; ordem: number; emoji: string | null; programa_id: string };
+type Program = { id: string; title: string };
+type Module = { id: string; title: string; sort_order: number; emoji: string | null; program_id: string };
 
 const navItems = [
   { to: '/', label: 'Início', icon: '🏠' },
@@ -23,10 +23,10 @@ export default function Layout() {
 
   const [programsExpanded, setProgramsExpanded] = useState(false);
   const [expandedProgramId, setExpandedProgramId] = useState<string | null>(null);
-  const [programas, setProgramas] = useState<Programa[]>([]);
-  const [modulosByPrograma, setModulosByPrograma] = useState<Record<string, Modulo[]>>({});
+  const [programas, setProgramas] = useState<Program[]>([]);
+  const [modulosByPrograma, setModulosByPrograma] = useState<Record<string, Module[]>>({});
   
-  const [profile, setProfile] = useState<{ nome_completo?: string; avatar_url?: string } | null>(null);
+  const [profile, setProfile] = useState<{ full_name?: string; avatar_url?: string } | null>(null);
 
   useEffect(() => {
     if (!hasSupabaseConfig || !user) {
@@ -38,26 +38,26 @@ export default function Layout() {
     
     supabase
       .from('profiles')
-      .select('nome_completo, avatar_url')
+      .select('full_name, avatar_url')
       .eq('id', user.id)
       .single()
       .then(({ data }) => setProfile(data));
 
     supabase
-      .from('programas')
-      .select('id, titulo')
+      .from('programs')
+      .select('id, title')
       .order('updated_at', { ascending: false })
-      .then(({ data }) => setProgramas((data ?? []) as Programa[]));
+      .then(({ data }) => setProgramas((data ?? []) as Program[]));
   }, [user?.id]);
 
   const loadModulosForProgram = async (programaId: string) => {
     if (modulosByPrograma[programaId]) return;
     const { data } = await supabase
-      .from('modulos')
-      .select('id, titulo, ordem, emoji, programa_id')
-      .eq('programa_id', programaId)
-      .order('ordem', { ascending: true });
-    setModulosByPrograma((prev) => ({ ...prev, [programaId]: (data ?? []) as Modulo[] }));
+      .from('modules')
+      .select('id, title, sort_order, emoji, program_id')
+      .eq('program_id', programaId)
+      .order('sort_order', { ascending: true });
+    setModulosByPrograma((prev) => ({ ...prev, [programaId]: (data ?? []) as Module[] }));
   };
 
   const toggleProgram = (programaId: string) => {
@@ -190,7 +190,7 @@ export default function Layout() {
                           onClick={closeSidebar}
                         >
                           <span className="sidebar-link-icon">📁</span>
-                          <span className="sidebar-program-title">{prog.titulo}</span>
+                          <span className="sidebar-program-title">{prog.title}</span>
                         </NavLink>
                       </div>
                       {isExpanded && (
@@ -207,7 +207,7 @@ export default function Layout() {
                                 <span className="sidebar-module-emoji">
                                   {mod.emoji && mod.emoji.trim() ? mod.emoji : '📄'}
                                 </span>
-                                <span className="sidebar-module-title">{mod.titulo}</span>
+                                <span className="sidebar-module-title">{mod.title}</span>
                               </NavLink>
                             </li>
                           ))}
@@ -242,12 +242,12 @@ export default function Layout() {
               <img src={profile.avatar_url} alt="Avatar" className="sidebar-user-avatar" />
             ) : (
               <span className="sidebar-user-avatar-placeholder">
-                {(profile?.nome_completo || user?.email || '?').charAt(0).toUpperCase()}
+                {(profile?.full_name || user?.email || '?').charAt(0).toUpperCase()}
               </span>
             )}
             <div className="sidebar-user-info">
-              <span className="sidebar-user-name" title={profile?.nome_completo || user?.email || ''}>
-                {profile?.nome_completo || user?.email?.split('@')[0] || 'Usuário'}
+              <span className="sidebar-user-name" title={profile?.full_name || user?.email || ''}>
+                {profile?.full_name || user?.email?.split('@')[0] || 'Usuário'}
               </span>
               <span className="sidebar-user-email" title={user?.email || ''}>
                 {user?.email || ''}
