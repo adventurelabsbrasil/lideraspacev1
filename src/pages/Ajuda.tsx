@@ -4,6 +4,7 @@ import './Ajuda.css';
 type SectionId =
   | 'visao-geral'
   | 'roles'
+  | 'equipe'
   | 'programas'
   | 'modulos'
   | 'blocos'
@@ -15,6 +16,7 @@ type SectionId =
 const sections: { id: SectionId; label: string; icon: string }[] = [
   { id: 'visao-geral', label: 'Visão geral', icon: '📋' },
   { id: 'roles', label: 'Roles e permissões', icon: '🔐' },
+  { id: 'equipe', label: 'Equipe e membros', icon: '👥' },
   { id: 'programas', label: 'Programas', icon: '📚' },
   { id: 'modulos', label: 'Módulos', icon: '📄' },
   { id: 'blocos', label: 'Blocos dinâmicos', icon: '🧩' },
@@ -136,6 +138,30 @@ UPDATE public.profiles
 SET is_super_admin = true
 WHERE id = 'seu-user-uuid'::uuid;`}
               </pre>
+            </section>
+          )}
+
+          {activeSection === 'equipe' && (
+            <section id="equipe" className="ajuda-section">
+              <h2>Equipe e membros</h2>
+              <p>
+                Admins podem gerenciar membros em <strong>Equipe</strong> (menu lateral). Lá você
+                adiciona usuários pelo e-mail e define o nível de acesso.
+              </p>
+              <h3>Como adicionar um usuário</h3>
+              <ol>
+                <li>Acesse <strong>Equipe</strong> na sidebar.</li>
+                <li>Selecione a organização.</li>
+                <li>Informe o e-mail (o usuário precisa já ter feito login ou cadastro no app).</li>
+                <li>Escolha o acesso: Aluno, Admin da organização ou Admin geral.</li>
+                <li>Clique em Adicionar.</li>
+              </ol>
+              <h3>Roles ao adicionar</h3>
+              <ul>
+                <li><strong>Aluno</strong> — visualiza programas e módulos, salva anotações.</li>
+                <li><strong>Admin da organização</strong> — cria/edita programas e módulos da org.</li>
+                <li><strong>Admin geral</strong> — acesso total à organização.</li>
+              </ul>
             </section>
           )}
 
@@ -389,6 +415,7 @@ WHERE id = 'seu-user-uuid'::uuid;`}
                   <tr><td><code>/login</code></td><td>Login</td><td>Autenticação</td></tr>
                   <tr><td><code>/</code></td><td>Inicio</td><td>Dashboard inicial</td></tr>
                   <tr><td><code>/perfil</code></td><td>Perfil</td><td>Nome e avatar</td></tr>
+                  <tr><td><code>/equipe</code></td><td>Equipe</td><td>Gerenciar membros (admins)</td></tr>
                   <tr><td><code>/programas</code></td><td>MeusProgramas</td><td>Lista de programas</td></tr>
                   <tr><td><code>/programas/novo</code></td><td>ProgramaNovo</td><td>Criar programa</td></tr>
                   <tr><td><code>/programas/:id</code></td><td>ProgramaDetalhe</td><td>Detalhe do programa</td></tr>

@@ -10,6 +10,7 @@ type Module = { id: string; title: string; sort_order: number; emoji: string | n
 
 const navItems = [
   { to: '/', label: 'Início', icon: '🏠' },
+  { to: '/equipe', label: 'Equipe', icon: '👥' },
   { to: '/tarefas', label: 'Minhas Tarefas', icon: '✅' },
   { to: '/ativos', label: 'Meus Ativos', icon: '📎' },
   { to: '/ajuda', label: 'Ajuda', icon: '❓' },
@@ -23,15 +24,15 @@ export default function Layout() {
 
   const [programsExpanded, setProgramsExpanded] = useState(false);
   const [expandedProgramId, setExpandedProgramId] = useState<string | null>(null);
-  const [programas, setProgramas] = useState<Program[]>([]);
-  const [modulosByPrograma, setModulosByPrograma] = useState<Record<string, Module[]>>({});
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [modulesByProgram, setModulesByProgram] = useState<Record<string, Module[]>>({});
   
   const [profile, setProfile] = useState<{ full_name?: string; avatar_url?: string } | null>(null);
 
   useEffect(() => {
     if (!hasSupabaseConfig || !user) {
-      setProgramas([]);
-      setModulosByPrograma({});
+      setPrograms([]);
+      setModulesByProgram({});
       setProfile(null);
       return;
     }
@@ -47,23 +48,23 @@ export default function Layout() {
       .from('programs')
       .select('id, title')
       .order('updated_at', { ascending: false })
-      .then(({ data }) => setProgramas((data ?? []) as Program[]));
+      .then(({ data }) => setPrograms((data ?? []) as Program[]));
   }, [user?.id]);
 
-  const loadModulosForProgram = async (programaId: string) => {
-    if (modulosByPrograma[programaId]) return;
+  const loadModulesForProgram = async (programId: string) => {
+    if (modulesByProgram[programId]) return;
     const { data } = await supabase
       .from('modules')
       .select('id, title, sort_order, emoji, program_id')
-      .eq('program_id', programaId)
+      .eq('program_id', programId)
       .order('sort_order', { ascending: true });
-    setModulosByPrograma((prev) => ({ ...prev, [programaId]: (data ?? []) as Module[] }));
+    setModulesByProgram((prev) => ({ ...prev, [programId]: (data ?? []) as Module[] }));
   };
 
-  const toggleProgram = (programaId: string) => {
+  const toggleProgram = (programId: string) => {
     setExpandedProgramId((prev) => {
-      const next = prev === programaId ? null : programaId;
-      if (next) loadModulosForProgram(next);
+      const next = prev === programId ? null : programId;
+      if (next) loadModulesForProgram(next);
       return next;
     });
   };
@@ -71,16 +72,16 @@ export default function Layout() {
   useEffect(() => {
     const m = location.pathname.match(/^\/programas\/([^/]+)(?:\/modulos\/[^/]+)?\/?$/);
     if (m) {
-      const programaId = m[1];
+      const programId = m[1];
       setProgramsExpanded(true);
-      setExpandedProgramId(programaId);
-      loadModulosForProgram(programaId);
+      setExpandedProgramId(programId);
+      loadModulesForProgram(programId);
     }
   }, [location.pathname]);
 
-  const isProgramaActive = (id: string) => location.pathname === `/programas/${id}`;
-  const isModuloActive = (programaId: string, moduloId: string) =>
-    location.pathname === `/programas/${programaId}/modulos/${moduloId}`;
+  const isProgramActive = (id: string) => location.pathname === `/programas/${id}`;
+  const isModuleActive = (programId: string, moduleId: string) =>
+    location.pathname === `/programas/${programId}/modulos/${moduleId}`;
 
   const closeSidebar = () => setSidebarOpen(false);
 
@@ -163,10 +164,10 @@ export default function Layout() {
             </button>
             {programsExpanded && (
               <ul className="sidebar-tree-children">
-                {programas.map((prog) => {
-                  const modulos = modulosByPrograma[prog.id] ?? [];
+                {programs.map((prog) => {
+                  const modules = modulesByProgram[prog.id] ?? [];
                   const isExpanded = expandedProgramId === prog.id;
-                  const programActive = isProgramaActive(prog.id);
+                  const programActive = isProgramActive(prog.id);
                   return (
                     <li key={prog.id} className="sidebar-program-wrap">
                       <div className="sidebar-program-row" style={{ marginLeft: 'var(--space-4)' }}>
@@ -195,12 +196,12 @@ export default function Layout() {
                       </div>
                       {isExpanded && (
                         <ul className="sidebar-modules">
-                          {modulos.map((mod) => (
+                          {modules.map((mod) => (
                             <li key={mod.id}>
                               <NavLink
                                 to={`/programas/${prog.id}/modulos/${mod.id}`}
                                 className={({ isActive }) =>
-                                  `sidebar-module-link ${isActive || isModuloActive(prog.id, mod.id) ? 'active' : ''}`
+                                  `sidebar-module-link ${isActive || isModuleActive(prog.id, mod.id) ? 'active' : ''}`
                                 }
                                 onClick={closeSidebar}
                               >

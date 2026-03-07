@@ -30,7 +30,7 @@ export default function ProgramaNovo() {
         .from('organization_members')
         .select('organization_id, organizations(id, nome)')
         .eq('user_id', user.id)
-        .eq('role', 'lidera_admin');
+        .in('role', ['lidera_admin', 'org_admin']);
       setLoadingOrgs(false);
       if (err) {
         setError('Não foi possível carregar as organizações.');
@@ -100,8 +100,25 @@ export default function ProgramaNovo() {
         <p className="programa-novo-loading">Carregando organizações…</p>
       ) : organizations.length === 0 ? (
         <div className="programa-novo-empty">
-          <p>Você precisa ser <strong>Dono da Lidera</strong> (lidera_admin) de uma organização para criar programas.</p>
-          <p>Crie uma organização ou peça que um administrador adicione você como lidera_admin.</p>
+          <p>Você precisa ser <strong>admin</strong> (lidera_admin ou org_admin) de uma organização para criar programas.</p>
+          <p>Crie uma organização ou peça que um administrador adicione você como admin.</p>
+          <p className="programa-novo-hint">
+            Se você é da Adventure Labs: rode o script{' '}
+            <code>supabase/add_user_as_admin.sql</code> no SQL Editor do Supabase. Substitua{' '}
+            <code>SEU_USER_ID_AQUI</code> pelo seu ID:
+          </p>
+          <p className="programa-novo-user-id">
+            <strong>Seu User ID:</strong>{' '}
+            <code
+              title="Clique para copiar"
+              onClick={() => user?.id && navigator.clipboard?.writeText(user.id)}
+              onKeyDown={(e) => e.key === 'Enter' && user?.id && navigator.clipboard?.writeText(user.id)}
+              role="button"
+              tabIndex={0}
+            >
+              {user?.id ?? '—'}
+            </code>
+          </p>
           <Link to="/programas" className="programa-novo-link">← Voltar aos programas</Link>
         </div>
       ) : (

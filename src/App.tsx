@@ -15,6 +15,7 @@ import TarefaDetalhe from './pages/TarefaDetalhe';
 import MeusAtivos from './pages/MeusAtivos';
 import AtivoDetalhe from './pages/AtivoDetalhe';
 import Ajuda from './pages/Ajuda';
+import Equipe from './pages/Equipe';
 import Perfil from './pages/Perfil';
 
 export default function App() {
@@ -34,14 +35,15 @@ export default function App() {
         <Route path="programas" element={<MeusProgramas />} />
         <Route path="programas/novo" element={<ProgramaNovo />} />
         <Route path="programas/:id/editar" element={<ProgramaEditar />} />
-        <Route path="programas/:id/modulos/novo" element={<ModuloNovo />} />
-        <Route path="programas/:programaId/modulos/:moduloId/editar" element={<ModuloEditar />} />
+        <Route path="programas/:programId/modulos/novo" element={<ModuloNovo />} />
+        <Route path="programas/:programId/modulos/:moduleId/editar" element={<ModuloEditar />} />
         <Route path="programas/:id" element={<ProgramaDetalhe />} />
-        <Route path="programas/:programaId/modulos/:moduloId" element={<ModuloDetalhe />} />
+        <Route path="programas/:programId/modulos/:moduleId" element={<ModuloDetalhe />} />
         <Route path="tarefas" element={<MinhasTarefas />} />
         <Route path="tarefas/:id" element={<TarefaDetalhe />} />
         <Route path="ativos" element={<MeusAtivos />} />
         <Route path="ativos/:id" element={<AtivoDetalhe />} />
+        <Route path="equipe" element={<Equipe />} />
         <Route path="ajuda" element={<Ajuda />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

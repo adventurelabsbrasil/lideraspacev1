@@ -37,6 +37,7 @@ Plataforma de gestão de programas de liderança com autenticação, organizaç�
 | `/login` | Login | Autenticação |
 | `/` | Inicio | Dashboard inicial |
 | `/perfil` | Perfil | Nome e avatar |
+| `/equipe` | Equipe | Gerenciar membros (admins) |
 | `/programas` | MeusProgramas | Lista de programas |
 | `/programas/novo` | ProgramaNovo | Criar programa |
 | `/programas/:id` | ProgramaDetalhe | Detalhe do programa |
@@ -96,7 +97,7 @@ Execute as migrações em ordem:
 supabase db push
 ```
 
-Ou, no SQL Editor do Supabase, rode manualmente os arquivos em `supabase/migrations/` (001 a 009).
+Ou, no SQL Editor do Supabase, rode manualmente os arquivos em `supabase/migrations/` (001 a 011).
 
 ### 3. Seed de organizações e admins
 
@@ -106,6 +107,15 @@ Após criar usuários em **Authentication > Users**, rode no SQL Editor:
 # Ajuste os UUIDs conforme os IDs dos usuários no Auth
 supabase/seed_orgs_and_admins.sql
 ```
+
+**Se não conseguir criar programas:** o seed usa UUIDs fixos. Se seu usuário tem outro ID, use:
+
+```bash
+# Substitua SEU_USER_ID_AQUI pelo seu UUID (Supabase > Authentication > Users)
+supabase/add_user_as_admin.sql
+```
+
+O app mostra seu User ID na tela "Novo programa" quando você não tem permissão.
 
 Para super admin (ver todos os dados):
 
