@@ -52,7 +52,7 @@ export default function ProgramaEditar() {
           .eq('organization_id', row.organization_id)
           .eq('user_id', user.id)
           .single();
-        setIsAdmin(orgMember?.role === 'lidera_admin');
+        setIsAdmin(['lidera_admin', 'org_admin'].includes(orgMember?.role ?? ''));
       } else {
         setIsAdmin(false);
       }

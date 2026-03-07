@@ -1,3 +1,5 @@
+import MDEditor from '@uiw/react-md-editor';
+import { useTheme } from '../contexts/ThemeContext';
 import './BlockEditor.css';
 
 export type Block = {
@@ -13,6 +15,9 @@ type Props = {
 };
 
 export default function BlockEditor({ blocks, onChange }: Props) {
+  const { theme } = useTheme() ?? { theme: 'light' as const };
+  const mdColorMode = theme === 'dark' || theme === 'original' ? 'dark' : 'light';
+
   const addBlock = (type: Block['type']) => {
     onChange([...blocks, { id: Date.now().toString() + Math.random(), type, content: '' }]);
   };
@@ -57,12 +62,16 @@ export default function BlockEditor({ blocks, onChange }: Props) {
             )}
             
             {block.type === 'text' && (
-              <textarea 
-                className="block-input block-textarea" 
-                placeholder="Digite seu texto..." 
-                value={block.content} 
-                onChange={e => updateBlock(i, { content: e.target.value })} 
-              />
+              <div className="block-md-editor-wrap" data-color-mode={mdColorMode}>
+                <MDEditor
+                  value={block.content}
+                  onChange={(val) => updateBlock(i, { content: val ?? '' })}
+                  preview="edit"
+                  hideToolbar={false}
+                  visibleDragbar={false}
+                  height={180}
+                />
+              </div>
             )}
 
             {block.type === 'link' && (

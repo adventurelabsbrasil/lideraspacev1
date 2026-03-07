@@ -2,21 +2,21 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Inicio.css';
 
-// Dados mock para a parte visual (serão substituídos por Supabase depois)
-const programasMock = [
+// Mock data for visual layout (will be replaced by Supabase later)
+const programsMock = [
   { id: '1', title: 'Liderança em Ação', progresso: 65, totalTarefas: 12, concluidas: 8 },
   { id: '2', title: 'Gestão de Equipes', progresso: 30, totalTarefas: 10, concluidas: 3 },
   { id: '3', title: 'Comunicação Eficaz', progresso: 0, totalTarefas: 8, concluidas: 0 },
 ];
 
-const tarefasResumoMock = [
+const tasksSummaryMock = [
   { id: '1', title: 'Módulo 1 - Introdução', programa: 'Liderança em Ação', status: 'Concluída', prazo: '15/02' },
   { id: '2', title: 'Feedback 360°', programa: 'Liderança em Ação', status: 'Em andamento', prazo: '28/03' },
   { id: '3', title: 'Planejamento de reuniões', programa: 'Gestão de Equipes', status: 'Pendente', prazo: '05/04' },
   { id: '4', title: 'Escuta ativa', programa: 'Comunicação Eficaz', status: 'Pendente', prazo: '12/04' },
 ];
 
-const ativosRecentesMock = [
+const recentAssetsMock = [
   { id: '1', tipo: 'Tarefa concluída', title: 'Módulo 1 - Introdução', quando: 'Hoje, 14:32' },
   { id: '2', tipo: 'Novo programa', title: 'Comunicação Eficaz', quando: 'Ontem' },
   { id: '3', tipo: 'Progresso', title: 'Feedback 360° — 60%', quando: '28/02' },
@@ -50,7 +50,7 @@ export default function Inicio() {
           <Link to="/programas/novo" className="inicio-btn-novo">Novo programa</Link>
         </div>
         <div className="inicio-cards">
-          {programasMock.map((p) => (
+          {programsMock.map((p) => (
             <Link key={p.id} to={`/programas/${p.id}`} className="inicio-card">
               <div className="inicio-card-header">
                 <span className="inicio-card-nome">{p.title}</span>
@@ -85,7 +85,7 @@ export default function Inicio() {
               </tr>
             </thead>
             <tbody>
-              {tarefasResumoMock.map((t) => (
+              {tasksSummaryMock.map((t) => (
                 <tr key={t.id}>
                   <td className="inicio-table-titulo">
                     <Link to={`/tarefas/${t.id}`} className="inicio-table-link">{t.title}</Link>
@@ -108,7 +108,7 @@ export default function Inicio() {
       <section className="inicio-section">
         <h2 className="inicio-section-title">Últimos ativos</h2>
         <div className="inicio-scorecards">
-          {ativosRecentesMock.map((a) => (
+          {recentAssetsMock.map((a) => (
             <Link key={a.id} to={`/ativos/${a.id}`} className="inicio-scorecard inicio-scorecard--link">
               <span className="inicio-scorecard-tipo">{a.tipo}</span>
               <span className="inicio-scorecard-titulo">{a.title}</span>

@@ -15,7 +15,7 @@ type Props = {
   label: string;
   placeholder?: string;
   variant?: Variant;
-  /** When set, show upload option. pathPrefix e.g. 'banners', contextId e.g. programa id */
+  /** When set, show upload option. pathPrefix e.g. 'banners', contextId e.g. program id */
   uploadContext?: { pathPrefix: string; contextId: string };
 };
 

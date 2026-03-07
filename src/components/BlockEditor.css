@@ -18,11 +18,17 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s ease;
+}
+
+.block-item:hover {
+  border-color: var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
 .block-item:focus-within {
   border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 25%, transparent);
 }
 
 .block-controls {
@@ -137,4 +143,15 @@
 .block-adder-buttons button:hover {
   border-color: var(--primary);
   color: var(--primary);
+}
+
+/* MDEditor wrapper for text block */
+.block-md-editor-wrap {
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.block-md-editor-wrap [data-color-mode] {
+  --color-canvas-subtle: var(--input-bg);
+  --color-border-default: var(--border);
 }

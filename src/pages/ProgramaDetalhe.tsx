@@ -24,8 +24,8 @@ type Module = {
 export default function ProgramaDetalhe() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [programa, setPrograma] = useState<Program | null>(null);
-  const [modulos, setModulos] = useState<Module[]>([]);
+  const [program, setProgram] = useState<Program | null>(null);
+  const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -45,12 +45,12 @@ export default function ProgramaDetalhe() {
         .single();
       if (progErr) {
         setError(progErr.message);
-        setPrograma(null);
-        setModulos([]);
+        setProgram(null);
+        setModules([]);
         setLoading(false);
         return;
       }
-      setPrograma(progData as Program);
+      setProgram(progData as Program);
 
       if (user?.id && progData?.organization_id) {
         const { data: orgMember } = await supabase
@@ -59,7 +59,7 @@ export default function ProgramaDetalhe() {
           .eq('organization_id', progData.organization_id)
           .eq('user_id', user.id)
           .single();
-        setIsAdmin(orgMember?.role === 'lidera_admin');
+        setIsAdmin(['lidera_admin', 'org_admin'].includes(orgMember?.role ?? ''));
       }
 
       const { data: modData, error: modErr } = await supabase
@@ -67,8 +67,8 @@ export default function ProgramaDetalhe() {
         .select('id, title, sort_order, emoji')
         .eq('program_id', id)
         .order('sort_order', { ascending: true });
-      if (!modErr) setModulos((modData ?? []) as Module[]);
-      else setModulos([]);
+      if (!modErr) setModules((modData ?? []) as Module[]);
+      else setModules([]);
       setLoading(false);
     }
     load();
@@ -91,7 +91,7 @@ export default function ProgramaDetalhe() {
     );
   }
 
-  if (error || !programa) {
+  if (error || !program) {
     return (
       <div className="page-content detalhe-page">
         <p className="detalhe-placeholder detalhe-error">{error ?? 'Programa não encontrado.'}</p>
@@ -107,12 +107,12 @@ export default function ProgramaDetalhe() {
         <span className="detalhe-breadcrumb-sep">/</span>
         <Link to="/programas">Programas</Link>
         <span className="detalhe-breadcrumb-sep">/</span>
-        <span>{programa.title}</span>
+        <span>{program.title}</span>
       </nav>
-      {programa.banner_image_url && (
+      {program.banner_image_url && (
         <div className="programa-detalhe-banner-wrap">
           <img
-            src={programa.banner_image_url}
+            src={program.banner_image_url}
             alt=""
             className="programa-detalhe-banner"
           />
@@ -120,9 +120,9 @@ export default function ProgramaDetalhe() {
       )}
       <header className="detalhe-header">
         <div className="detalhe-header-main">
-          <h1 className="detalhe-title">{programa.title}</h1>
+          <h1 className="detalhe-title">{program.title}</h1>
           <p className="detalhe-meta">
-            Atualizado em {new Date(programa.updated_at).toLocaleDateString('pt-BR')}
+            Atualizado em {new Date(program.updated_at).toLocaleDateString('pt-BR')}
           </p>
         </div>
         {isAdmin && (
@@ -138,11 +138,11 @@ export default function ProgramaDetalhe() {
       </header>
       <section className="detalhe-section">
         <h2 className="detalhe-section-title">Módulos</h2>
-        {modulos.length === 0 ? (
+        {modules.length === 0 ? (
           <p className="detalhe-placeholder">Nenhum módulo ainda.</p>
         ) : (
           <ul className="programa-detalhe-modulos">
-            {modulos.map((m) => (
+            {modules.map((m) => (
               <li key={m.id}>
                 <Link
                   to={`/programas/${id}/modulos/${m.id}`}

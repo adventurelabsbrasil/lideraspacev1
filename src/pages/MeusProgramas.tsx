@@ -14,7 +14,7 @@ type Program = {
 
 export default function MeusProgramas() {
   const { user, loading: authLoading } = useAuth();
-  const [programas, setProgramas] = useState<Program[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +26,7 @@ export default function MeusProgramas() {
     }
     if (authLoading || !user) {
       setLoading(false);
-      setProgramas([]);
+      setPrograms([]);
       return;
     }
     async function load() {
@@ -45,7 +45,7 @@ export default function MeusProgramas() {
         setError(`Erro ao carregar: ${err.message}. Verifique .env (URL e Anon key) e o console (F12).`);
         return;
       }
-      setProgramas(data ?? []);
+      setPrograms(data ?? []);
     }
     load();
   }, [authLoading, user?.id]);
@@ -61,14 +61,14 @@ export default function MeusProgramas() {
       {error && <p className="meus-programas-error" role="alert">{error}</p>}
       {loading ? (
         <p className="meus-programas-loading">Carregando…</p>
-      ) : programas.length === 0 ? (
+      ) : programs.length === 0 ? (
         <div className="meus-programas-empty">
           <p>Nenhum programa ainda.</p>
           <Link to="/programas/novo" className="meus-programas-link">Criar o primeiro programa</Link>
         </div>
       ) : (
         <ul className="meus-programas-list">
-          {programas.map((p) => (
+          {programs.map((p) => (
             <li key={p.id}>
               <Link to={`/programas/${p.id}`} className="meus-programas-card">
                 <span className="meus-programas-card-titulo">{p.title}</span>

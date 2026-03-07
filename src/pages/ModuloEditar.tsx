@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import ModuloForm from './ModuloForm';
 
 export default function ModuloEditar() {
-  const { programaId, moduloId } = useParams<{ programaId: string; moduloId: string }>();
-  if (!programaId || !moduloId) return null;
-  return <ModuloForm programaId={programaId} moduloId={moduloId} />;
+  const { programId, moduleId } = useParams<{ programId: string; moduleId: string }>();
+  if (!programId || !moduleId) return null;
+  return <ModuloForm programId={programId} moduleId={moduleId} />;
 }

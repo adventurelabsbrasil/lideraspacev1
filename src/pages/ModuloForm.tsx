@@ -4,30 +4,22 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import ImageUrlOrUpload from '../components/ImageUrlOrUpload';
 import BlockEditor, { type Block } from '../components/BlockEditor';
+import { youtubeToEmbedUrl } from '../lib/youtube';
 import './Detalhe.css';
 import './ProgramaNovo.css';
 import './ModuloForm.css';
 
 type MaterialItem = { url: string; label: string; icon: string };
 
-function youtubeToEmbedUrl(url: string): string {
-  const t = url.trim();
-  if (!t) return '';
-  const m = t.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
-  if (m) return `https://www.youtube.com/embed/${m[1]}`;
-  if (t.includes('youtube.com/embed/')) return t;
-  return t;
-}
-
 type Props = {
-  programaId: string;
-  moduloId?: string | null;
+  programId: string;
+  moduleId?: string | null;
 };
 
-export default function ModuloForm({ programaId, moduloId }: Props) {
+export default function ModuloForm({ programId, moduleId }: Props) {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const isEdit = Boolean(moduloId);
+  const isEdit = Boolean(moduleId);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +47,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       const { data: progData } = await supabase
         .from('programs')
         .select('organization_id')
-        .eq('id', programaId)
+        .eq('id', programId)
         .single();
 
       if (user?.id && progData?.organization_id) {
@@ -65,24 +57,24 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
           .eq('organization_id', progData.organization_id)
           .eq('user_id', user.id)
           .single();
-        setIsAdmin(orgMember?.role === 'lidera_admin');
+        setIsAdmin(['lidera_admin', 'org_admin'].includes(orgMember?.role ?? ''));
       } else {
         setIsAdmin(false);
       }
 
-      let query = supabase.from('modules').select('id, title').eq('program_id', programaId);
-      if (moduloId) {
-        query = query.neq('id', moduloId);
+      let query = supabase.from('modules').select('id, title').eq('program_id', programId);
+      if (moduleId) {
+        query = query.neq('id', moduleId);
       }
       const { data: parentsData } = await query;
       setAvailableParents(parentsData || []);
 
-      if (isEdit && moduloId) {
+      if (isEdit && moduleId) {
         const { data, error: err } = await supabase
           .from('modules')
           .select('title, sort_order, emoji, parent_id, description, blocks, topics, subtopics, video_youtube_embed_url, materials, banner_image_url, program_favicon_url')
-          .eq('id', moduloId)
-          .eq('program_id', programaId)
+          .eq('id', moduleId)
+          .eq('program_id', programId)
           .single();
         if (err || !data) {
           setError(err?.message ?? 'Módulo não encontrado.');
@@ -106,7 +98,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       setLoading(false);
     }
     load();
-  }, [programaId, moduloId, isEdit, user?.id]);
+  }, [programId, moduleId, isEdit, user?.id]);
 
   function addTopic() { setTopics((prev) => [...prev, '']); }
   function setTopicAt(i: number, v: string) {
@@ -155,22 +147,22 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       program_favicon_url: programFaviconUrl.trim() || null,
     };
 
-    if (isEdit && moduloId) {
+    if (isEdit && moduleId) {
       const { error: err } = await supabase
         .from('modules')
         .update(payload)
-        .eq('id', moduloId)
-        .eq('program_id', programaId);
+        .eq('id', moduleId)
+        .eq('program_id', programId);
       setSubmitting(false);
       if (err) {
         setError(err.message ?? 'Erro ao salvar.');
         return;
       }
-      navigate(`/programas/${programaId}/modulos/${moduloId}`);
+      navigate(`/programas/${programId}/modulos/${moduleId}`);
     } else {
       const { data, error: err } = await supabase
         .from('modules')
-        .insert({ ...payload, program_id: programaId })
+        .insert({ ...payload, program_id: programId })
         .select('id')
         .single();
       setSubmitting(false);
@@ -178,8 +170,8 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
         setError(err.message ?? 'Erro ao criar página.');
         return;
       }
-      if (data?.id) navigate(`/programas/${programaId}/modulos/${data.id}`);
-      else navigate(`/programas/${programaId}`);
+      if (data?.id) navigate(`/programas/${programId}/modulos/${data.id}`);
+      else navigate(`/programas/${programId}`);
     }
   }
 
@@ -196,7 +188,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       <div className="page-content programa-novo-page">
         <div className="programa-novo-empty">
           <p>Você precisa ser <strong>lidera_admin</strong> para editar ou criar páginas.</p>
-          <Link to={`/programas/${programaId}`} className="programa-novo-link">← Voltar ao programa</Link>
+          <Link to={`/programas/${programId}`} className="programa-novo-link">← Voltar ao programa</Link>
         </div>
       </div>
     );
@@ -207,7 +199,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
       <nav className="detalhe-breadcrumb">
         <Link to="/programas">Programas</Link>
         <span className="detalhe-breadcrumb-sep">/</span>
-        <Link to={`/programas/${programaId}`}>Programa</Link>
+        <Link to={`/programas/${programId}`}>Programa</Link>
         <span className="detalhe-breadcrumb-sep">/</span>
         <span>{isEdit ? 'Editar Página' : 'Nova Página'}</span>
       </nav>
@@ -340,7 +332,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
           onChange={setBannerImageUrl}
           placeholder="https://..."
           variant="banner"
-          uploadContext={moduloId ? { pathPrefix: 'modulos/banner', contextId: moduloId } : undefined}
+          uploadContext={moduleId ? { pathPrefix: 'modulos/banner', contextId: moduleId } : undefined}
         />
         
         <div className="modulo-form-group" style={{ marginTop: 'var(--space-8)' }}>
@@ -373,7 +365,7 @@ export default function ModuloForm({ programaId, moduloId }: Props) {
         </div>
 
         <div className="programa-novo-actions">
-          <Link to={isEdit && moduloId ? `/programas/${programaId}/modulos/${moduloId}` : `/programas/${programaId}`} className="programa-novo-btn programa-novo-btn-cancel">
+          <Link to={isEdit && moduleId ? `/programas/${programId}/modulos/${moduleId}` : `/programas/${programId}`} className="programa-novo-btn programa-novo-btn-cancel">
             Cancelar
           </Link>
           <button type="submit" className="programa-novo-btn programa-novo-btn-submit" disabled={submitting}>
