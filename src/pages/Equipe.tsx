@@ -31,23 +31,25 @@ export default function Equipe() {
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!hasSupabaseConfig || !user) return;
+    const uid = user?.id;
+    if (!hasSupabaseConfig || !uid) return;
     async function loadOrgs() {
       setLoadingOrgs(true);
       const { data, error: err } = await supabase
         .from('organization_members')
         .select('organization_id, organizations(id, nome)')
-        .eq('user_id', user.id)
+        .eq('user_id', uid)
         .in('role', ['lidera_admin', 'org_admin']);
       setLoadingOrgs(false);
       if (err) {
         setError('Erro ao carregar organizações.');
         return;
       }
-      type Row = { organization_id: string; organizations: { id: string; nome: string } | null };
+      type Row = { organization_id: string; organizations: { id: string; nome: string } | { id: string; nome: string }[] | null };
       const seen = new Set<string>();
       const orgs: Organization[] = (data ?? []).reduce<Organization[]>((acc, row: Row) => {
-        const org = row.organizations;
+        const raw = row.organizations;
+        const org = Array.isArray(raw) ? raw[0] : raw;
         if (org?.id && org?.nome && !seen.has(org.id)) {
           seen.add(org.id);
           acc.push({ id: org.id, nome: org.nome });
@@ -77,7 +79,13 @@ export default function Equipe() {
         setError('Erro ao carregar membros.');
         return;
       }
-      setMembers((data ?? []) as Member[]);
+      const rows = data ?? [];
+      const normalized: Member[] = rows.map((r: { id: string; user_id: string; role: string; profiles: { full_name: string | null } | { full_name: string | null }[] | null }) => {
+        const p = r.profiles;
+        const profile = Array.isArray(p) ? p[0] : p;
+        return { id: r.id, user_id: r.user_id, role: r.role, profiles: profile ?? null };
+      });
+      setMembers(normalized);
     }
     loadMembers();
   }, [selectedOrgId]);
