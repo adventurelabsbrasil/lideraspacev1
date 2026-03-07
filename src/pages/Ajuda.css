@@ -1,0 +1,232 @@
+/* Ajuda — estilo documentação API */
+
+.ajuda-page {
+  padding: 0;
+  max-width: none;
+}
+
+.ajuda-layout {
+  display: flex;
+  min-height: calc(100vh - var(--space-8, 2rem));
+}
+
+/* Sidebar de navegação */
+.ajuda-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  padding: var(--space-5) var(--space-4);
+  border-right: 1px solid var(--border);
+  background: var(--bg-card);
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+}
+
+.ajuda-sidebar-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 var(--space-4);
+  padding: 0 var(--space-2);
+}
+
+.ajuda-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ajuda-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ajuda-nav-item:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.ajuda-nav-item.active {
+  background: var(--primary-alpha);
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.ajuda-nav-icon {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* Conteúdo principal */
+.ajuda-content {
+  flex: 1;
+  padding: var(--space-6) var(--space-8);
+  max-width: 720px;
+}
+
+.ajuda-header {
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--border);
+}
+
+.ajuda-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-2);
+}
+
+.ajuda-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Seções */
+.ajuda-section {
+  padding-bottom: var(--space-8);
+}
+
+.ajuda-section h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-4);
+  padding-top: var(--space-2);
+}
+
+.ajuda-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: var(--space-6) 0 var(--space-3);
+}
+
+.ajuda-section p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 var(--space-4);
+}
+
+.ajuda-section ul {
+  margin: 0 0 var(--space-4);
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.ajuda-section li {
+  margin-bottom: var(--space-2);
+}
+
+.ajuda-section code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-sm);
+  background: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+.ajuda-section strong {
+  color: var(--text-primary);
+}
+
+/* Tabelas estilo API doc */
+.ajuda-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  margin: var(--space-4) 0;
+}
+
+.ajuda-table th,
+.ajuda-table td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.ajuda-table th {
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--hover-bg);
+}
+
+.ajuda-table td {
+  color: var(--text-secondary);
+}
+
+.ajuda-table td code {
+  font-size: 0.8em;
+  padding: 0.1em 0.3em;
+}
+
+.ajuda-table tbody tr:hover td {
+  background: var(--hover-bg);
+}
+
+/* Blocos de código */
+.ajuda-code {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  padding: var(--space-4);
+  margin: var(--space-4) 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .ajuda-layout {
+    flex-direction: column;
+  }
+
+  .ajuda-sidebar {
+    width: 100%;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-4);
+  }
+
+  .ajuda-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .ajuda-nav-item {
+    padding: var(--space-2) var(--space-3);
+    font-size: 0.85rem;
+  }
+
+  .ajuda-content {
+    padding: var(--space-4) var(--space-4);
+  }
+
+  .ajuda-header h1 {
+    font-size: 1.4rem;
+  }
+}

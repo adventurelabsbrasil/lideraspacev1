@@ -1,20 +1,66 @@
 # LideraSpace
 
-Aplicação para gestão de programas de liderança: autenticação (Supabase), dashboard inicial, programas por organização, módulos, tarefas e ativos. Desenvolvida com Vite + React.
+Plataforma de gestão de programas de liderança com autenticação, organizações multitenant, programas, módulos hierárquicos e blocos dinâmicos estilo Notion. Desenvolvida com **Vite + React + TypeScript** e **Supabase** (Auth, Database, Storage).
 
-## Visão geral
+---
 
-- **Módulo 1** — Autenticação (email/senha e Google), layout com menu lateral, tema claro/escuro, páginas base.
-- **Módulo 2** — Página inicial (boas-vindas, cards de programas, tabela de tarefas, scorecards de ativos), modelo de dados no Supabase (organizações, programas, módulos, tarefas, ativos), telas de detalhe e fluxo “Novo programa”.
-- **Módulo 3** — UI/UX (design tokens, componentes base), layout responsivo (sidebar drawer em mobile), telas de detalhe com dados reais e vídeo YouTube, área admin contextual (editar programa, novo/editar módulo com vídeo e materiais).
-- **Módulo 4** — Rich text estilo Notion nos módulos (Markdown com editor de toolbar e renderização com links iconizados); banners e favicons com opção de URL ou upload no Supabase Storage.
+## Estado atual do app (atualizado)
 
-A documentação de cada módulo fica em `docs/`:
+### Funcionalidades implementadas
 
-- [Módulo 1 — Autenticação e estrutura base](docs/MODULO_1.md)
-- [Módulo 2 — Página inicial, modelo de dados e fluxo de programas](docs/MODULO_2.md)
-- [Módulo 3 — UI/UX, responsividade e área admin](docs/MODULO_3.md)
-- [Módulo 4 — Rich text e imagens (URL + upload)](docs/MODULO_4.md)
+| Área | Recurso | Status |
+|------|---------|--------|
+| **Auth** | Login email/senha | ✅ |
+| **Auth** | Login com Google OAuth | ✅ |
+| **Auth** | Proteção de rotas | ✅ |
+| **Perfil** | Nome e avatar (upload Supabase Storage) | ✅ |
+| **Organizações** | Multitenant por organização | ✅ |
+| **Roles** | `lidera_admin`, `org_admin`, `aluno` | ✅ |
+| **Super admin** | `profiles.is_super_admin` para ver todos os dados | ✅ |
+| **Programas** | Listar, criar, editar, detalhe | ✅ |
+| **Módulos** | Hierarquia (`parent_id`), subpáginas | ✅ |
+| **Módulos** | Blocos dinâmicos (título, texto Markdown, link, vídeo, tarefa, subpágina) | ✅ |
+| **Módulos** | Conteúdo Markdown (`content`) como fallback | ✅ |
+| **Módulos** | Vídeo YouTube (URL → embed automático) | ✅ |
+| **Estado do aluno** | Anotações e checklist por módulo (`student_module_states`) | ✅ |
+| **Storage** | Bucket `avatars` (avatar do perfil) | ✅ |
+| **Storage** | Bucket `programas` (banners, favicons) | ✅ |
+| **UI** | Temas: Original (Deep Navy + Dourado), Dark, Light | ✅ |
+| **UI** | Sidebar com árvore de programas e módulos | ✅ |
+| **UI** | Layout responsivo (drawer em mobile) | ✅ |
+| **RLS** | Políticas por organização e role | ✅ |
+
+### Rotas
+
+| Rota | Página | Descrição |
+|------|--------|-----------|
+| `/login` | Login | Autenticação |
+| `/` | Inicio | Dashboard inicial |
+| `/perfil` | Perfil | Nome e avatar |
+| `/programas` | MeusProgramas | Lista de programas |
+| `/programas/novo` | ProgramaNovo | Criar programa |
+| `/programas/:id` | ProgramaDetalhe | Detalhe do programa |
+| `/programas/:id/editar` | ProgramaEditar | Editar programa |
+| `/programas/:programId/modulos/novo` | ModuloNovo | Novo módulo |
+| `/programas/:programId/modulos/:moduleId` | ModuloDetalhe | Detalhe do módulo |
+| `/programas/:programId/modulos/:moduleId/editar` | ModuloEditar | Editar módulo |
+| `/tarefas` | MinhasTarefas | Tarefas (em construção) |
+| `/ativos` | MeusAtivos | Ativos (em construção) |
+| `/ajuda` | Ajuda | Documentação e guia do admin |
+
+### Organograma e roles
+
+- **lidera_admin** — Admin geral (Adventure Labs) ou admin da organização cliente. Acesso completo a programas e módulos da org.
+- **org_admin** — Admin da organização. Pode criar/editar programas e módulos da org.
+- **aluno** — Membro matriculado. Visualiza conteúdo e salva anotações/checklist.
+- **Super admin** — `profiles.is_super_admin = true` vê todas as organizações (bypass RLS para SELECT).
+
+### Stack técnico
+
+- **Frontend:** React 19, Vite 7, TypeScript 5.9, React Router 7
+- **Backend:** Supabase (PostgreSQL, Auth, Storage)
+- **Editor:** @uiw/react-md-editor (Markdown com toolbar)
+- **Markdown:** react-markdown, remark-gfm, rehype-sanitize
 
 ---
 
@@ -23,11 +69,11 @@ A documentação de cada módulo fica em `docs/`:
 - Node.js 18+
 - Conta [Supabase](https://supabase.com)
 
+---
+
 ## Configuração
 
 ### 1. Variáveis de ambiente
-
-Copie o arquivo de exemplo e preencha com as credenciais do seu projeto Supabase:
 
 ```bash
 cp .env.example .env
@@ -40,78 +86,97 @@ VITE_SUPABASE_URL=https://seu-projeto.supabase.co
 VITE_SUPABASE_ANON_KEY=sua-anon-key
 ```
 
-A **URL** e a **Anon key** ficam em: [Supabase Dashboard](https://app.supabase.com) → seu projeto → **Settings** → **API**.
+URL e Anon key em: Supabase Dashboard → **Settings** → **API**.
 
 ### 2. Banco de dados
 
-No **SQL Editor** do Supabase, execute em ordem:
+Execute as migrações em ordem:
 
-1. `supabase/migrations/001_schema_organizacoes_programas.sql` — cria tabelas.
-2. `supabase/migrations/002_modulo_conteudo_and_storage.sql` — coluna `conteudo` em modulos e bucket Storage para imagens (Módulo 4).
-3. (Opcional) `supabase/seed_mock_data.sql` — popula dados de exemplo (é necessário ter pelo menos um usuário em Auth antes).
+```bash
+supabase db push
+```
 
-### 3. Login com Google (opcional)
+Ou, no SQL Editor do Supabase, rode manualmente os arquivos em `supabase/migrations/` (001 a 009).
 
-Para usar “Entrar com Google”:
+### 3. Seed de organizações e admins
 
-1. No Supabase: **Authentication** → **Providers** → **Google** → ative e preencha **Client ID** e **Client Secret** do [Google Cloud Console](https://console.cloud.google.com/).
-2. Em **Authentication** → **URL Configuration**, defina **Site URL** (ex.: `http://localhost:5173` para dev) e em **Redirect URLs** adicione `http://localhost:5173/**` (e a URL de produção quando houver).
+Após criar usuários em **Authentication > Users**, rode no SQL Editor:
 
-### 4. Instalação e execução
+```bash
+# Ajuste os UUIDs conforme os IDs dos usuários no Auth
+supabase/seed_orgs_and_admins.sql
+```
+
+Para super admin (ver todos os dados):
+
+```sql
+UPDATE public.profiles SET is_super_admin = true WHERE id = 'seu-user-uuid'::uuid;
+```
+
+### 4. Login com Google
+
+1. Supabase: **Authentication** → **Providers** → **Google** → ative e preencha Client ID e Secret.
+2. **URL Configuration:** Site URL e Redirect URLs (ex.: `http://localhost:5173/**`).
+
+### 5. Instalação e execução
 
 ```bash
 npm install
 npm run dev
 ```
 
-Acesse [http://localhost:5173](http://localhost:5173). Faça login e use o menu para navegar (Início, Meus Programas, etc.).
+Acesse [http://localhost:5173](http://localhost:5173).
+
+---
 
 ## Deploy no Vercel
 
-1. **Conectar o repositório**
-   - Acesse [vercel.com](https://vercel.com) e faça login (GitHub recomendado).
-   - **Add New** → **Project** e importe o repositório do LideraSpace (conecte o GitHub se ainda não estiver conectado).
-   - O Vercel detecta Vite automaticamente; o `vercel.json` já define build e rewrites para SPA.
+1. Conecte o repositório ao Vercel.
+2. Adicione `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` em Environment Variables.
+3. Configure Site URL e Redirect URLs no Supabase para a URL do Vercel.
+4. Deploy automático a cada push.
 
-2. **Variáveis de ambiente (obrigatório para o app funcionar no Vercel)**
-   - No Vercel: **Settings** → **Environment Variables** do projeto.
-   - Adicione exatamente (nomes com VITE_):
-     - `VITE_SUPABASE_URL` = URL do projeto (ex.: `https://xxxx.supabase.co`)
-     - `VITE_SUPABASE_ANON_KEY` = Anon key (em Supabase: Settings → API → anon public).
-   - Marque **Production** (e **Preview** se quiser em branches).
-   - **Importante:** no Vite as variáveis são embutidas no build. Depois de criar/alterar as variáveis, é obrigatório **gerar um novo deploy** (Deployments → ⋮ no último deploy → Redeploy, ou dê um push no repositório). Sem isso, o app no Vercel continua sem URL/chave e programas e login não funcionam.
-
-3. **Supabase (produção)**
-   - No [Supabase](https://app.supabase.com): **Authentication** → **URL Configuration**.
-   - Em **Site URL** use a URL do Vercel (ex.: `https://seu-projeto.vercel.app`).
-   - Em **Redirect URLs** adicione `https://seu-projeto.vercel.app/**` (e `https://*.vercel.app/**` se usar previews).
-   - Se usar login com Google, o redirect pós-login funcionará após essa configuração.
-
-4. **Deploy**
-   - Cada push na branch conectada (ex.: `main`) gera um deploy automático. O primeiro deploy roda após você clicar em **Deploy** na importação.
+---
 
 ## Scripts
 
-- `npm run dev` — servidor de desenvolvimento
-- `npm run build` — build de produção
-- `npm run preview` — preview do build
-- `npm run lint` — ESLint
+| Comando | Descrição |
+|---------|-----------|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm run preview` | Preview do build |
+| `npm run lint` | ESLint |
+
+---
 
 ## Estrutura do projeto
 
 ```
 src/
-  pages/        # Login, Início, Programas, ProgramaNovo, ProgramaEditar, ProgramaDetalhe,
-               # ModuloDetalhe, ModuloNovo, ModuloEditar, ModuloForm, Tarefas, Ativos, Ajuda, detalhes
-  components/   # Layout, ProtectedRoute, ui.css (componentes base)
-  contexts/     # AuthContext, ThemeContext
-  lib/          # cliente Supabase
-docs/           # Documentação por módulo (MODULO_1.md, MODULO_2.md, MODULO_3.md, …)
+  pages/          # Páginas (Login, Inicio, MeusProgramas, ModuloDetalhe, etc.)
+  components/     # Layout, BlockEditor, RichTextContent, ImageUrlOrUpload, etc.
+  contexts/       # AuthContext, ThemeContext
+  lib/            # supabase.ts, youtube.ts
+docs/             # Documentação (MODULO_1.md, VERIFICACAO_SUPABASE_CODIGO.md)
 supabase/
-  migrations/   # Schema (organizações, programas, módulos, tarefas, ativos)
-  seed_mock_data.sql
+  migrations/     # 001–009 (schema, storage, RLS, super admin)
+  seed_orgs_and_admins.sql
 ```
 
-## Segurança (multitenant)
+---
 
-Em produção, use apenas a **Anon key** no frontend. RLS (Row Level Security) e controle de acesso por organização estão previstos para um **módulo futuro**; até lá, o schema não aplica RLS nas tabelas.
+## Documentação adicional
+
+- [Módulo 1 — Autenticação](docs/MODULO_1.md)
+- [Módulo 2 — Modelo de dados](docs/MODULO_2.md)
+- [Módulo 3 — UI/UX e admin](docs/MODULO_3.md)
+- [Módulo 4 — Rich text e imagens](docs/MODULO_4.md)
+- [Verificação Supabase ↔ Código](docs/VERIFICACAO_SUPABASE_CODIGO.md)
+
+---
+
+## Segurança
+
+- Use apenas a **Anon key** no frontend.
+- RLS ativo em `organizations`, `organization_members`, `programs`, `modules`, `tasks`, `assets`, `profiles`, `student_module_states`.
+- Políticas baseadas em `user_in_organization()` e `user_can_admin_program()`.
